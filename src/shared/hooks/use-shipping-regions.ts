@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback, useMemo } from "react";
 import type { SingleValue } from "react-select";
 import { binderbyteService } from "@/services/binderbyte.service";

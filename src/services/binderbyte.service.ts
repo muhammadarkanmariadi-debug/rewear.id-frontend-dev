@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { env } from "@/env";
 import { BINDERBYTE_API_BASE_URL } from "@/configs/api";
 import type {

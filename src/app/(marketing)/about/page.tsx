@@ -56,8 +56,8 @@ export default function AboutPage() {
       {/* Stats/Highlight Section */}
       <div className="max-w-5xl mx-auto mb-20 md:mb-32 rounded-3xl border border-border/60 bg-surface-container-low p-8 md:p-16 text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-4">
-          "Sustainable fashion bukan lagi sekadar tren, melainkan sebuah
-          keharusan."
+          &quot;Sustainable fashion bukan lagi sekadar tren, melainkan sebuah
+          keharusan.&quot;
         </h2>
         <p className="text-muted-foreground mb-10 max-w-2xl mx-auto">
           Melalui platform jual-beli preloved kami, kami bertujuan untuk

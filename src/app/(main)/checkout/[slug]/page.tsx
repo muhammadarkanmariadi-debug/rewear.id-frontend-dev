@@ -8,6 +8,7 @@ import { ShippingCalculator } from "@/widgets/checkout/shipping-calculator";
 import { AddressSection } from "@/widgets/checkout/address-section";
 
 import { binderbyteService } from "@/services/binderbyte.service";
+import { BinderbyteProvince } from "@/entities";
 
 interface CheckoutPageProps {
   params: Promise<{ slug: string }>;
@@ -22,7 +23,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   // Server-side fetching for region data
-  let initialProvinces: any[] = [];
+  let initialProvinces: BinderbyteProvince[] = [];
   
   try {
     initialProvinces = await binderbyteService.getProvinces();

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -38,10 +39,10 @@ function CourierOptionComponent(props: OptionProps<CourierOption>) {
   return (
     <components.Option {...props}>
       <div className="flex items-center gap-3">
-        <div className="relative w-8 h-8 shrink-0 rounded bg-white flex items-center justify-center overflow-hidden border border-border/30">
+        <div className="relative flex justify-center items-center bg-white border border-border/30 rounded w-8 h-8 overflow-hidden shrink-0">
           <Image src={props.data.image} alt={props.data.label} width={28} height={28} className="object-contain" unoptimized />
         </div>
-        <span className="text-sm font-medium">{props.data.label}</span>
+        <span className="font-medium text-sm">{props.data.label}</span>
       </div>
     </components.Option>
   );
@@ -51,10 +52,10 @@ function CourierSingleValue(props: SingleValueProps<CourierOption>) {
   return (
     <components.SingleValue {...props}>
       <div className="flex items-center gap-3">
-        <div className="relative w-6 h-6 shrink-0 rounded bg-white flex items-center justify-center overflow-hidden border border-border/30">
+        <div className="relative flex justify-center items-center bg-white border border-border/30 rounded w-6 h-6 overflow-hidden shrink-0">
           <Image src={props.data.image} alt={props.data.label} width={22} height={22} className="object-contain" unoptimized />
         </div>
-        <span className="text-sm font-medium">{props.data.label}</span>
+        <span className="font-medium text-sm">{props.data.label}</span>
       </div>
     </components.SingleValue>
   );
@@ -150,13 +151,13 @@ export function ShippingCalculator({ initialProvinces }: ShippingCalculatorProps
   return (
     <div className="flex flex-col gap-6">
       {/* Wilayah Tujuan */}
-      <div className="border border-border bg-card rounded-2xl p-6 shadow-sm">
-        <h3 className="font-bold mb-4 flex items-center gap-2">
+      <div className="bg-card shadow-sm p-6 border border-border rounded-2xl">
+        <h3 className="flex items-center gap-2 mb-4 font-bold">
           <MapPin className="w-5 h-5" /> Tentukan Tujuan Pengiriman
         </h3>
         <div className="flex flex-col gap-4">
           <div>
-            <label className="text-xs font-semibold uppercase text-muted-foreground mb-1.5 block">Provinsi</label>
+            <label className="block mb-1.5 font-semibold text-muted-foreground text-xs uppercase">Provinsi</label>
             <Select<RegionOption>
               options={provinceOptions}
               value={selectedProvince}
@@ -169,7 +170,7 @@ export function ShippingCalculator({ initialProvinces }: ShippingCalculatorProps
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase text-muted-foreground mb-1.5 block">Kota / Kabupaten</label>
+            <label className="block mb-1.5 font-semibold text-muted-foreground text-xs uppercase">Kota / Kabupaten</label>
             <Select<RegionOption>
               options={cityOptions}
               value={selectedCity}
@@ -184,7 +185,7 @@ export function ShippingCalculator({ initialProvinces }: ShippingCalculatorProps
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase text-muted-foreground mb-1.5 block">Kecamatan</label>
+            <label className="block mb-1.5 font-semibold text-muted-foreground text-xs uppercase">Kecamatan</label>
             <Select<RegionOption>
               options={districtOptions}
               value={selectedDistrict}
@@ -202,8 +203,8 @@ export function ShippingCalculator({ initialProvinces }: ShippingCalculatorProps
       </div>
 
       {/* Pilihan Kurir */}
-      <div className="border border-border bg-card rounded-2xl p-6 shadow-sm">
-        <h3 className="font-bold mb-4 flex items-center gap-2">
+      <div className="bg-card shadow-sm p-6 border border-border rounded-2xl">
+        <h3 className="flex items-center gap-2 mb-4 font-bold">
           <Truck className="w-5 h-5" /> Pilih Kurir
         </h3>
         <Select<CourierOption>
