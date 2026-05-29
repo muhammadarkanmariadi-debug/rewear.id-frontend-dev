@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# rewear.id - Modern Preloved Marketplace
 
-## Getting Started
+Selamat datang di repositori Frontend **rewear.id**, sebuah platform e-commerce Customer-to-Customer (C2C) modern yang dirancang khusus untuk memfasilitasi jual beli barang *preloved* fesyen dengan aman, premium, dan estetik.
 
-First, run the development server:
+Repositori ini berfokus pada hasil rilis MVP *(Minimum Viable Product)* tahap awal dengan batas waktu pengerjaan 3 hari - mengeliminasi fitur-fitur sosial (seperti obrolan & penilaian) agar 100% terfokus pada alur terpenting: **Escrow & Checkout**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Fitur Utama (MVP)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Jelajah Pintar & Estetik (Beranda & Produk)**
+   - Desain *(Monochrome-Premium)* yang menonjolkan visual pakaian *preloved*.
+   - Halaman produk dengan dukungan Galeri Gambar *(Gallery Thumbnails)* dan Detail Penjual Esensial bergaya *(Sticky Sidebar)*.
+   
+2. **Checkout Kilat & Realistis**
+   - Halaman Ringkasan Belanja dengan estimasi pengiriman dan tarif tambahan.
+   
+3. **Escrow Timeline (Keamanan Rekber)**
+   - Simulasi Pelacakan Transaksi Escrow di dalam status pemesanan pembeli mulai dari Pembayaran, Ekspedisi, hingga Dana Diteruskan! 
+   
+4. **Seller Dashboard Terpadu**
+   - `/dashboard`: Ringkasan Cepat metrik penjualan.
+   - `/my-products`: Inventaris penuh yang memuat tambah-kurang *(CRUD)* katalog baju siap tayang untuk user.
+   - `/orders` & `/wallet`: Simulasi penerimaan pesanan dan pencairan saldo transaksi secara mandiri.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 💻 Tech Stack & Arsitektur
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Kami menggunakan arsitektur termodern untuk meraba tingkat performa ekstrem (Fast Refresh < 100ms):
 
-## Learn More
+- **Framework:** Next.js 16 (App Router + Turbopack)
+- **Engine UI:** React 19 + Tailwind CSS v4 *(Bleeding Edge)*
+- **Ikonografi & Gaya:** Lucide React + Konsep *(Shadcn/UI)* Base Components
+- **State Management:** Zustand (Autentikasi Lokal Sementara)
+- **Data Source:** Murni berjalan `Client-Side/Server-Component` dengan konfigurasi MOCK Data lengkap tanpa ketergantungan Backend Server tahap MVP ini.
+- **Konsep Struktur Direktori:** Feature-Sliced Design Pattern (`/src/widgets`, `/src/shared`, `/src/entities`).
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Cara Menjalankan (Getting Started)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pastikan Anda memiliki [Node.js](https://nodejs.org/en/) v18.17+ yang terinstall di perangkat Anda.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone repository ini**
+   ```bash
+   git clone https://github.com/rewear-id/rewear-frontend.git
+   cd rewear.id-frontend
+   ```
 
-## Deploy on Vercel
+2. **Hapus cache lokal jika ada kendala saat pergantian arsitektur Next.js (Khusus Windows)**
+   ```powershell
+   rm -Recurse .next
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Install Dependensi**
+   ```bash
+   npm install
+   ```
+   *(Penting: Saat ini kita menggunakan dependensi terbaru seperti npm turbopack).*
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Jalankan Development Server**
+   ```bash
+   npm run dev
+   ```
+   Aplikasi akan memuat di `http://localhost:3000`.
+
+## 📂 Struktur Direktori Menarik
+- **`(main)` Route Group**: Merupakan kumpulan rute Katalog/Publik *(Layout)*. 
+- **`(dashboard)` Route Group**: Terlindungi *Middleware Proxy*, memuat dasbor Penjual/Afiliasi dengan *(Layout)* terpisah `dashboard-layout`.
+
+---
+*Dibuat untuk MVP 3-Hari Perancangan Aplikasi Marketplace.*
