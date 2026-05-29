@@ -10,7 +10,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       {/* Kolom Kiri: Visual (Hanya untuk Desktop) */}
       <div className="hidden lg:flex w-1/2 relative bg-surface-container-high overflow-hidden items-end justify-center p-12">
         <Image
-          src="https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?w=1080&q=80"
+          src="https://picsum.photos/seed/authhero/1080/1600"
           alt="Vintage Fashion Style"
           fill
           className="object-cover"

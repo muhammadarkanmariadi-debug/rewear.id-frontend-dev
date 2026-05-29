@@ -66,7 +66,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
           <div className="border border-border bg-card rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
             <div className="w-24 h-24 relative rounded-xl overflow-hidden mb-4 border border-border/50">
               <Image 
-                src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&q=80" 
+                src="https://picsum.photos/seed/order123/600/800" 
                 alt="Product" 
                 fill 
                 className="object-cover" 

@@ -1,4 +1,4 @@
-import { Product } from "@/entities/product.entity";
+import { Product } from "@/entities/product";
 import { User } from "@/entities/user";
 
 export const MOCK_USERS: Record<string, User> = {
@@ -84,7 +84,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "L",
     brand: "Uniqlo",
     images: [
-      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&q=80",
+      "https://picsum.photos/seed/p1a/600/800",
+      "https://picsum.photos/seed/p1b/600/800",
+      "https://picsum.photos/seed/p1c/600/800",
+      "https://picsum.photos/seed/p1d/600/800",
     ],
     seller: MOCK_USERS["u1"],
     status: "aktif",
@@ -102,7 +105,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "M",
     brand: "Levi's",
     images: [
-      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&q=80",
+      "https://picsum.photos/seed/p2a/600/800",
+      "https://picsum.photos/seed/p2b/600/800",
+      "https://picsum.photos/seed/p2c/600/800",
+      "https://picsum.photos/seed/p2d/600/800",
     ],
     seller: MOCK_USERS["u2"],
     status: "aktif",
@@ -120,7 +126,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "S",
     brand: "Erigo",
     images: [
-      "https://images.unsplash.com/photo-1624378439575-d1ead6bb1d65?w=600&q=80",
+      "https://picsum.photos/seed/p3a/600/800",
+      "https://picsum.photos/seed/p3b/600/800",
+      "https://picsum.photos/seed/p3c/600/800",
+      "https://picsum.photos/seed/p3d/600/800",
     ],
     seller: MOCK_USERS["u3"],
     status: "aktif",
@@ -138,7 +147,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "XL",
     brand: "H&M",
     images: [
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80",
+      "https://picsum.photos/seed/p4a/600/800",
+      "https://picsum.photos/seed/p4b/600/800",
+      "https://picsum.photos/seed/p4c/600/800",
+      "https://picsum.photos/seed/p4d/600/800",
     ],
     seller: MOCK_USERS["u4"],
     status: "aktif",
@@ -156,7 +168,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "L",
     brand: "Zara",
     images: [
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80",
+      "https://picsum.photos/seed/p5a/600/800",
+      "https://picsum.photos/seed/p5b/600/800",
+      "https://picsum.photos/seed/p5c/600/800",
+      "https://picsum.photos/seed/p5d/600/800",
     ],
     seller: MOCK_USERS["u1"],
     status: "aktif",
@@ -174,7 +189,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "M",
     brand: "Stradivarius",
     images: [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&q=80",
+      "https://picsum.photos/seed/p6a/600/800",
+      "https://picsum.photos/seed/p6b/600/800",
+      "https://picsum.photos/seed/p6c/600/800",
+      "https://picsum.photos/seed/p6d/600/800",
     ],
     seller: MOCK_USERS["u2"],
     status: "aktif",
@@ -192,7 +210,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "M",
     brand: "Nikicio",
     images: [
-      "https://images.unsplash.com/photo-1596755094514-f87e32f85e2c?w=600&q=80",
+      "https://picsum.photos/seed/p7a/600/800",
+      "https://picsum.photos/seed/p7b/600/800",
+      "https://picsum.photos/seed/p7c/600/800",
+      "https://picsum.photos/seed/p7d/600/800",
     ],
     seller: MOCK_USERS["u4"],
     status: "aktif",
@@ -210,7 +231,10 @@ export const MOCK_PRODUCTS: Product[] = [
     size: "L",
     brand: "Zara",
     images: [
-      "https://images.unsplash.com/photo-1584865288642-42078afe6942?w=600&q=80",
+      "https://picsum.photos/seed/p8a/600/800",
+      "https://picsum.photos/seed/p8b/600/800",
+      "https://picsum.photos/seed/p8c/600/800",
+      "https://picsum.photos/seed/p8d/600/800",
     ],
     seller: MOCK_USERS["u1"],
     status: "aktif",

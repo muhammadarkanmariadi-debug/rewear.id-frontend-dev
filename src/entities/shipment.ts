@@ -23,6 +23,25 @@ export interface Shipment extends Timestamps {
   delivered_at: string | null;
 }
 
+// ── Binderbyte Region & Courier Types ──────────────────────
+
+export interface BinderbyteProvince {
+  id: string;
+  name: string;
+}
+
+export interface BinderbyteCity {
+  id: string;
+  name: string;
+}
+
+export interface BinderbyteCourier {
+  code: string;
+  description: string;
+}
+
+// ── Backend-facing Types (used by shipment.service.ts) ─────
+
 export interface ShippingCostRequest {
   origin: string;
   destination: string;
@@ -34,11 +53,11 @@ export interface ShippingCostOption {
   service: string;
   description: string;
   cost: number;
-  etd: string; // estimated time of delivery, e.g. "2-3"
+  etd: string;
 }
 
 export interface TrackingEvent {
   date: string;
-  description: string;
+  desc: string;
   location: string;
 }

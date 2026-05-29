@@ -22,6 +22,9 @@ export function Navbar() {
   const baseNavLinks = [
     { label: "Beranda", href: "/" },
     { label: "Produk", href: "/products" },
+    { label: "Tentang", href: "/about" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Kontak", href: "/contact" },
   ];
 
   const navLinks = isMounted && isAuthenticated 

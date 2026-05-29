@@ -43,7 +43,7 @@ export function HeroSection() {
           <div className="relative mx-auto w-full max-w-[500px] lg:max-w-none h-[400px] lg:h-[500px]">
             <div className="absolute right-0 top-0 w-2/3 h-4/5 rounded-2xl overflow-hidden shadow-2xl border-4 border-background z-20">
               <Image 
-                src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&q=80" 
+                src="https://picsum.photos/seed/hero1/600/800" 
                 alt="Vintage fashion rack"
                 fill
                 className="object-cover"
@@ -53,7 +53,7 @@ export function HeroSection() {
             </div>
             <div className="absolute left-0 bottom-0 w-3/5 h-3/5 rounded-2xl overflow-hidden shadow-xl border-4 border-background z-10 translate-y-8 lg:translate-x-8">
               <Image 
-                src="https://images.unsplash.com/photo-1489987707023-af8p3c9c9f69?w=600&q=80" 
+                src="https://picsum.photos/seed/hero2/600/800" 
                 alt="Denim streetwear"
                 fill
                 className="object-cover"

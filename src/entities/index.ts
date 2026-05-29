@@ -20,16 +20,15 @@ export type {
 
 export type {
   Product,
-  ProductImage,
   ProductCategory,
   ProductCondition,
-  ProductStatus,
+  ListingStatus as ProductStatus,
   ProductSize,
   ProductFilterParams,
   CreateProductRequest,
 } from "./product";
 
-export type { Order, OrderStatus, CreateOrderRequest } from "./order";
+export type { Order, EscrowStatus as OrderEscrowStatus, CreateOrderRequest } from "./order";
 
 export type { EscrowTransaction, EscrowStatus } from "./escrow";
 export { ESCROW_STATUS_LABELS } from "./escrow";
@@ -47,6 +46,9 @@ export type {
   ShippingCostRequest,
   ShippingCostOption,
   TrackingEvent,
+  BinderbyteProvince,
+  BinderbyteCity,
+  BinderbyteCourier,
 } from "./shipment";
 
 export type {

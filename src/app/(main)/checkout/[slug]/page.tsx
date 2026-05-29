@@ -4,6 +4,10 @@ import { formatRupiah } from "@/shared/utils/format";
 import { ShieldCheck, Truck, MapPin, CreditCard, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ShippingCalculator } from "@/widgets/checkout/shipping-calculator";
+import { AddressSection } from "@/widgets/checkout/address-section";
+
+import { binderbyteService } from "@/services/binderbyte.service";
 
 interface CheckoutPageProps {
   params: Promise<{ slug: string }>;
@@ -17,12 +21,21 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     notFound();
   }
 
+  // Server-side fetching for region data
+  let initialProvinces: any[] = [];
+  
+  try {
+    initialProvinces = await binderbyteService.getProvinces();
+  } catch (err) {
+    console.error("Failed to fetch provinces on server:", err);
+  }
+
   const SHIPPING_COST = 25000;
   const ESCROW_FEE = 3000;
   const TOTAL_PRICE = product.price + SHIPPING_COST + ESCROW_FEE;
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-6 md:py-10 max-w-4xl">
+    <div className="container mx-auto px-4 md:px-6 py-6 md:py-10 max-w-7xl">
       
       <Link href={`/products/${product.slug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4" />
@@ -37,23 +50,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         <div className="lg:col-span-2 flex flex-col gap-6">
           
           {/* Alamat Pengiriman */}
-          <div className="border border-border bg-card rounded-2xl p-6 shadow-sm">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5" /> Alamat Pengiriman
-            </h3>
-            <div className="bg-surface-container rounded-xl p-4 border border-border/50">
-              <p className="font-semibold mb-1">Rizky Firmansyah <span className="text-muted-foreground font-normal">(Rumah)</span></p>
-              <p className="text-sm text-muted-foreground mb-1">08123456789</p>
-              <p className="text-sm text-muted-foreground">Jl. Mawar Merah No. 12, Kebayoran Baru, Jakarta Selatan, 12160, DKI Jakarta</p>
-            </div>
-          </div>
+          <AddressSection />
 
           {/* Produk yang Dibeli */}
           <div className="border border-border bg-card rounded-2xl p-6 shadow-sm">
             <h3 className="font-bold mb-4">Detail Produk</h3>
             <div className="flex gap-4">
               <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-surface-container shrink-0 border border-border/50">
-                <Image src={product.images[0]} alt={product.title} fill className="object-cover" />
+                <Image src={product.images[0]} alt={product.title} fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h4 className="font-semibold text-sm line-clamp-2 mb-1">{product.title}</h4>
@@ -64,16 +68,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
           </div>
 
           {/* Opsi Pengiriman */}
-          <div className="border border-border bg-card rounded-2xl p-6 shadow-sm">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <Truck className="w-5 h-5" /> Pengiriman Bersama GoSend
-            </h3>
-            <select className="w-full bg-surface-container border border-border rounded-xl p-3 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20">
-              <option>GoSend Instant - Rp25.000 (Tiba Hari Ini)</option>
-              <option>GoSend Same Day - Rp15.000 (Tiba Besok)</option>
-              <option>JNE Reguler - Rp11.000 (2-3 Hari)</option>
-            </select>
-          </div>
+          <ShippingCalculator initialProvinces={initialProvinces} />
+
+          
 
         </div>
 

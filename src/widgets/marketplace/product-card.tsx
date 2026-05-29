@@ -1,5 +1,5 @@
 "use client";
-import { Product } from "@/entities/product.entity";
+import { Product } from "@/entities/product";
 import { formatRupiah } from "@/shared/utils/format";
 import Image from "next/image";
 import Link from "next/link";
