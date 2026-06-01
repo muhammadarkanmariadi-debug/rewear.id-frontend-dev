@@ -1,81 +1,36 @@
-import { httpClient } from "./http-client";
+import { httpGet, httpPost, httpPut, httpDelete } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type {
-  ApiResponse,
-  User,
-  UserProfile,
-  Withdrawal,
-  CreateWithdrawalRequest,
-  PaginatedResponse,
-} from "@/entities";
 
 export const userService = {
   async getProfile(userId: string) {
-    const res = await httpClient.get<ApiResponse<UserProfile>>(
-      API_ENDPOINTS.USER_PROFILE(userId),
-    );
-    return res.data.data;
+    return httpGet(API_ENDPOINTS.USER_PROFILE(userId), "token");
   },
-
-  async updateProfile(data: Partial<Pick<User, "name" | "bio" | "phone">>) {
-    const res = await httpClient.put<ApiResponse<User>>(
-      API_ENDPOINTS.AUTH_PROFILE_UPDATE,
-      data,
-    );
-    return res.data.data;
+  async updateProfile(data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPut(API_ENDPOINTS.AUTH_PROFILE_UPDATE, payload, "token");
   },
-
-  async uploadAvatar(file: File) {
-    const formData = new FormData();
-    formData.append("avatar", file);
-    const res = await httpClient.post<ApiResponse<User>>(
-      `${API_ENDPOINTS.USERS}/avatar`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data.data;
+  async uploadAvatar(formData: FormData) {
+    return httpPost(`${API_ENDPOINTS.USERS}/avatar`, formData, "token");
   },
-
-  async uploadKtp(file: File) {
-    const formData = new FormData();
-    formData.append("ktp_image", file);
-    const res = await httpClient.post<ApiResponse<{ status: string }>>(
-      API_ENDPOINTS.USER_KTP_UPLOAD,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data.data;
+  async uploadKtp(formData: FormData) {
+    return httpPost(API_ENDPOINTS.USER_KTP_UPLOAD, formData, "token");
   },
-
-  // ── Wishlist ─────────────────────────────────────────────
-  async getWishlist() {
-    const res = await httpClient.get<PaginatedResponse<{ product_id: string }>>(
-      API_ENDPOINTS.BOOKMARKS,
-    );
-    return res.data;
+  async getWishlist(params?: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.BOOKMARKS, "token", undefined, params);
   },
-
-  async addToWishlist(productId: string) {
-    await httpClient.post(API_ENDPOINTS.BOOKMARK_TOGGLE(productId));
+  async toggleWishlist(productId: string) {
+    const payload = await encryptClientPayload(JSON.stringify({}));
+    return httpPost(API_ENDPOINTS.BOOKMARK_TOGGLE(productId), payload, "token");
   },
-
   async removeFromWishlist(productId: string) {
-    await httpClient.delete(`${API_ENDPOINTS.BOOKMARKS}/${productId}`);
+    return httpDelete(`${API_ENDPOINTS.BOOKMARKS}/${productId}`, "token");
   },
-
-  // ── Withdrawals ──────────────────────────────────────────
-  async getWithdrawals() {
-    const res = await httpClient.get<PaginatedResponse<Withdrawal>>(
-      API_ENDPOINTS.WITHDRAWALS,
-    );
-    return res.data;
+  async getWithdrawals(params?: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.WITHDRAWALS, "token", undefined, params);
   },
-
-  async requestWithdrawal(data: CreateWithdrawalRequest) {
-    const res = await httpClient.post<ApiResponse<Withdrawal>>(
-      API_ENDPOINTS.WITHDRAWALS,
-      data,
-    );
-    return res.data.data;
+  async requestWithdrawal(data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPost(API_ENDPOINTS.WITHDRAWALS, payload, "token");
   },
 };

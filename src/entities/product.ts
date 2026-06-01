@@ -1,42 +1,68 @@
 import { User } from "./user";
 
-export type ProductCondition = "baru" | "bekas_baik" | "bekas" | "baru_dengan_tag" | "seperti_baru" | "baik" | "wajar";
-export type ProductCategory = "baju" | "celana" | "kaos" | "kemeja" | "jaket" | "hoodie" | "sweater" | "jeans" | "chino" | "jogger" | "celana_pendek" | "rok" | "dress" | "lainnya";
-export type ProductSize = "XS" | "S" | "M" | "L" | "XL" | "XXL" | "XXXL";
-export type ListingStatus = "aktif" | "terjual" | "diarsipkan";
+export type ProductCondition = "new_with_tag" | "like_new" | "good" | "fair";
+export type ProductStatus = "active" | "sold" | "archived";
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon_url: string | null;
+  sort_order: number;
+  children?: Category[];
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+}
+
+export interface ProductImage {
+  id: string;
+  image_url: string;
+  position: number;
+}
 
 export interface Product {
   id: string;
   slug: string;
   title: string;
   description: string;
-  price: number;
+  size: string;
   condition: ProductCondition;
-  category: ProductCategory;
-  size: ProductSize;
-  brand?: string;
-  images: string[];
+  color: string | null;
+  price: number;
+  weight_grams: number;
+  status: ProductStatus;
+  views_count: number;
   seller: User;
-  status: ListingStatus;
-  createdAt: string;
-  wishlistCount: number;
+  category: Category;
+  brand?: Brand;
+  images: ProductImage[] ;
+  created_at: string;
+  is_bookmarked?: boolean;
 }
 
 export interface ProductFilterParams {
-  category?: ProductCategory;
+  category_id?: string;
+  brand_id?: string;
   condition?: ProductCondition;
-  minPrice?: number;
-  maxPrice?: number;
-  search?: string;
+  min_price?: number;
+  max_price?: number;
+  q?: string;
 }
 
 export interface CreateProductRequest {
+  category_id: string;
+  brand_id?: string;
   title: string;
   description: string;
-  price: number;
+  size: string;
   condition: ProductCondition;
-  category: ProductCategory;
-  size: ProductSize;
-  brand?: string;
-  images?: string[];
+  color?: string;
+  price: number;
+  weight_grams: number;
+  images?: File[];
 }

@@ -1,8 +1,28 @@
 import { formatRupiah } from "@/shared/utils/format";
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { orderService } from "@/services";
 
-export default function OrdersPage() {
+export default async function OrdersPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const rawParams = await searchParams;
+  const role = (rawParams.role as string) || "buyer";
+
+  let orders = [];
+  try {
+    const res = role === "seller" 
+      ? await orderService.getSellerOrders() 
+      : await orderService.getAll();
+    // Normalizing so both arrays are accessible
+    orders = res.data || [];
+    console.log(orders)
+  } catch (err) {
+    console.error("Failed to load orders");
+  }
+
+  // Handle Select redirect through a simple map on client or just using Next.js <Link> in a client component?
+  // We can just rely on basic links or leave the select as a controlled UI in a sub-component.
+  // For simplicity, we can do a standard Server Component and link buttons instead of a native <select> or use a client wrapper for the toolbar.
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
@@ -22,11 +42,8 @@ export default function OrdersPage() {
             />
           </div>
           <div className="flex gap-2">
-            <select className="h-9 px-3 bg-background border border-border rounded-lg text-sm outline-none font-medium">
-               <option>Semua Peran</option>
-               <option>Sebagai Pembeli</option>
-               <option>Sebagai Penjual</option>
-            </select>
+            <Link href="?role=buyer" className={`h-9 px-4 flex items-center justify-center rounded-lg text-sm font-medium border ${role === 'buyer' ? 'bg-foreground text-background border-foreground' : 'bg-background border-border text-foreground hover:bg-muted'}`}>Sebagai Pembeli</Link>
+            <Link href="?role=seller" className={`h-9 px-4 flex items-center justify-center rounded-lg text-sm font-medium border ${role === 'seller' ? 'bg-foreground text-background border-foreground' : 'bg-background border-border text-foreground hover:bg-muted'}`}>Sebagai Penjual</Link>
           </div>
         </div>
 
@@ -37,55 +54,31 @@ export default function OrdersPage() {
               <tr>
                 <th className="px-6 py-4">ID Pesanan</th>
                 <th className="px-6 py-4">Peran</th>
-                <th className="px-6 py-4">Produk</th>
                 <th className="px-6 py-4">Total Tagihan</th>
-                <th className="px-6 py-4">Status & Escrow</th>
+                <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              <tr className="hover:bg-muted/30 transition-colors">
-                <td className="px-6 py-4 font-mono font-bold text-xs"><Link href="/orders/ORD-8923741" className="hover:underline">ORD-8923741</Link></td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-foreground text-background font-bold rounded-md text-xs">Pembeli</span>
-                </td>
-                <td className="px-6 py-4 truncate max-w-[200px]">Kemeja Flanel Uniqlo Merah...</td>
-                <td className="px-6 py-4 font-bold">{formatRupiah(178000)}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-blue-500/10 text-blue-500 font-bold rounded-md text-xs">Sedang Dikirim</span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                   <Link href="/orders/ORD-8923741" className="text-xs font-bold text-foreground py-1.5 px-3 bg-surface-container rounded-lg hover:bg-muted transition-colors">Lacak</Link>
-                </td>
-              </tr>
-              <tr className="hover:bg-muted/30 transition-colors">
-                <td className="px-6 py-4 font-mono font-bold text-xs">ORD-1092834</td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-surface-container border border-border text-foreground font-bold rounded-md text-xs">Penjual</span>
-                </td>
-                <td className="px-6 py-4 truncate max-w-[200px]">Celana Jeans Stradivarius...</td>
-                <td className="px-6 py-4 font-bold">{formatRupiah(210000)}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 font-bold rounded-md text-xs">Diproses</span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                   <Link href="#" className="text-xs font-bold text-foreground py-1.5 px-3 bg-surface-container rounded-lg hover:bg-muted transition-colors">Kirim</Link>
-                </td>
-              </tr>
-              <tr className="hover:bg-muted/30 transition-colors">
-                <td className="px-6 py-4 font-mono font-bold text-xs">ORD-5541238</td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-surface-container border border-border text-foreground font-bold rounded-md text-xs">Penjual</span>
-                </td>
-                <td className="px-6 py-4 truncate max-w-[200px]">Hoodie H&M Polos Abu-abu</td>
-                <td className="px-6 py-4 font-bold">{formatRupiah(150000)}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-green-500/10 text-green-500 font-bold rounded-md text-xs">Selesai / Cair</span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                   <Link href="#" className="text-xs font-bold text-foreground py-1.5 px-3 bg-surface-container rounded-lg hover:bg-muted transition-colors">Lihat</Link>
-                </td>
-              </tr>
+              {orders.length === 0 ? (
+                <tr>
+                   <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">Tidak ada pesanan ditemukan.</td>
+                </tr>
+              ) : orders.map((order: any) => (
+                <tr key={order.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-6 py-4 font-mono font-bold text-xs"><Link href={`/orders/${order.id}`} className="hover:underline">ORD-{order.id.slice(0, 8).toUpperCase()}</Link></td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2.5 py-1 ${role === 'buyer' ? 'bg-foreground text-background' : 'bg-surface-container border border-border text-foreground'} font-bold rounded-md text-xs`}>{role === 'buyer' ? 'Pembeli' : 'Penjual'}</span>
+                  </td>
+                  <td className="px-6 py-4 font-bold">{formatRupiah(Number(order.total_price))}</td>
+                  <td className="px-6 py-4">
+                    <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 font-bold rounded-md text-xs uppercase">{order.status}</span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                     <Link href={`/orders/${order.id}`} className="text-xs font-bold text-foreground py-1.5 px-3 bg-surface-container rounded-lg hover:bg-muted transition-colors">Lihat Detail</Link>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -93,3 +86,4 @@ export default function OrdersPage() {
     </div>
   );
 }
+

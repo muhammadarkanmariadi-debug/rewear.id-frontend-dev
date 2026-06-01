@@ -1,9 +1,16 @@
-import { MOCK_PRODUCTS } from "@/configs/mock-data";
+import { userService } from "@/services";
 import { ProductCard } from "@/widgets/marketplace/product-card";
 import { HeartCrack } from "lucide-react";
 
-export default function WishlistPage() {
-  const wishlistedItems = MOCK_PRODUCTS.slice(0, 4);
+export default async function WishlistPage() {
+  let wishlistedItems = [];
+  try {
+    const res = await userService.getWishlist();
+    // Assuming API returns array of products directly, or wrapped in data
+    wishlistedItems = res?.data || [];
+  } catch (error) {
+    console.error("Failed to load wishlist");
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -14,7 +21,7 @@ export default function WishlistPage() {
 
       {wishlistedItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {wishlistedItems.map(product => (
+          {wishlistedItems.map((product: any) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
@@ -30,3 +37,4 @@ export default function WishlistPage() {
     </div>
   );
 }
+

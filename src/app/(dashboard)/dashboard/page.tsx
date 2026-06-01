@@ -1,13 +1,29 @@
 import { formatRupiah } from "@/shared/utils/format";
 import { ArrowRight, Package, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
-import { MOCK_PRODUCTS } from "@/configs/mock-data";
+import { orderService, productService } from "@/services";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  let products = [];
+  let orders = [];
+
+  try {
+     const [prodRes, orderRes] = await Promise.all([
+        productService.getSellerProducts(),
+        orderService.getSellerOrders()
+     ]);
+     products = prodRes?.data?.slice(0, 3) || [];
+     orders = orderRes?.data?.slice(0, 4) || [];
+  } catch (err) {
+     console.error("Failed to load dashboard metrics");
+  }
+
+  // Dashboard sum metrics can be calculated directly or obtained via balance api if it exists.
+  // We will run basic calculation on orders as placeholder logic for dashboard.
   const stats = [
-    { label: "Total Penjualan", value: 124, icon: Package, amount: null },
-    { label: "Saldo Tersedia", value: null, icon: Wallet, amount: 2450000 },
-    { label: "Dana Tertahan (Escrow)", value: null, icon: TrendingUp, amount: 650000 },
+    { label: "Total Penjualanku", value: orders.length || 0, icon: Package, amount: null },
+    { label: "Saldo Tersedia", value: null, icon: Wallet, amount: products.length > 0 ? 0 : 0 },
+    { label: "Dana Tertahan (Escrow)", value: null, icon: TrendingUp, amount: 0 },
   ];
 
   return (
@@ -54,36 +70,24 @@ export default function DashboardPage() {
               <thead className="bg-surface-container text-muted-foreground text-xs uppercase font-bold border-b border-border">
                 <tr>
                   <th className="px-6 py-4">ID Pesanan</th>
-                  <th className="px-6 py-4">Produk</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                <tr className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-semibold"><Link href="/orders/ORD-8923741" className="hover:underline">ORD-8923741</Link></td>
-                  <td className="px-6 py-4 truncate max-w-[200px]">Kemeja Flanel Uniqlo Merah...</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 bg-blue-500/10 text-blue-500 font-bold rounded-md text-xs">Sedang Dikirim</span>
-                  </td>
-                  <td className="px-6 py-4 font-semibold">{formatRupiah(175000)}</td>
-                </tr>
-                <tr className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-semibold">ORD-1092834</td>
-                  <td className="px-6 py-4 truncate max-w-[200px]">Celana Jeans Stradivarius...</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 font-bold rounded-md text-xs">Diproses</span>
-                  </td>
-                  <td className="px-6 py-4 font-semibold">{formatRupiah(210000)}</td>
-                </tr>
-                <tr className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-semibold">ORD-5541238</td>
-                  <td className="px-6 py-4 truncate max-w-[200px]">Hoodie H&M Polos Abu-abu</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 bg-green-500/10 text-green-500 font-bold rounded-md text-xs">Selesai</span>
-                  </td>
-                  <td className="px-6 py-4 font-semibold">{formatRupiah(150000)}</td>
-                </tr>
+                {orders.length === 0 ? (
+                  <tr>
+                     <td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">Belum ada pesanan terbaru.</td>
+                  </tr>
+                ) : orders.map((order: any) => (
+                   <tr key={order.id} className="hover:bg-muted/30 transition-colors">
+                     <td className="px-6 py-4 font-semibold"><Link href={`/orders/${order.id}`} className="hover:underline">ORD-{order.id.slice(0, 8).toUpperCase()}</Link></td>
+                     <td className="px-6 py-4">
+                       <span className="px-2.5 py-1 bg-blue-500/10 text-blue-500 font-bold rounded-md text-xs uppercase">{order.status}</span>
+                     </td>
+                     <td className="px-6 py-4 font-semibold">{formatRupiah(Number(order.total_price))}</td>
+                   </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -96,19 +100,21 @@ export default function DashboardPage() {
           </div>
           
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-5">
-            {MOCK_PRODUCTS.slice(0, 3).map(product => (
+            {products.length === 0 ? (
+               <p className="text-sm text-muted-foreground py-4 text-center">Belum ada produk.</p>
+            ) : products.map((product: any) => (
               <div key={product.id} className="flex gap-4 items-center">
                 <div className="w-16 h-16 rounded-xl bg-surface-container overflow-hidden shrink-0 border border-border/50">
-                  <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover" />
+                  <img src={product.images?.[0] || ""} alt={product.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="min-w-0">
                   <h4 className="font-semibold text-sm truncate">{product.title}</h4>
-                  <p className="text-muted-foreground text-xs mt-1">Dilihat 120x • {product.wishlistCount} Favorit</p>
+                  <p className="text-muted-foreground text-xs mt-1">Status: {product.status}</p>
                 </div>
               </div>
             ))}
             
-            <Link href="/products" className="block w-full py-3 text-center text-sm font-bold bg-surface-container hover:bg-muted border border-border rounded-xl transition-colors">
+            <Link href="/my-products" className="block w-full py-3 text-center text-sm font-bold bg-surface-container hover:bg-muted border border-border rounded-xl transition-colors">
               Kelola Semua Produk
             </Link>
           </div>
@@ -118,3 +124,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

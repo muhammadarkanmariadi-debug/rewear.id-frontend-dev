@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware"; // 1. Import persist
 import type { User } from "@/entities";
 
 interface AuthState {
@@ -13,30 +14,35 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token:
-    typeof window !== "undefined"
-      ? localStorage.getItem("auth_token")
-      : null,
-  isAuthenticated: false,
-  isLoading: true,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      // State awal sekarang cukup set default saja
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      isLoading: true,
 
-  setAuth: (user, token) => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("auth_token", token);
+      setAuth: (user, token) => {
+        // Tidak perlu manual localStorage.setItem lagi!
+        set({ user, token, isAuthenticated: true, isLoading: false });
+      },
+
+      setUser: (user) => set({ user }),
+
+      logout: () => {
+      
+        set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+      },
+
+      setLoading: (isLoading) => set({ isLoading }),
+    }),
+    {
+      name: "auth-storage", // Nama kunci di localStorage
+      storage: createJSONStorage(() => localStorage), // Menggunakan localStorage
+      
+      // Opsional: Jika kamu menggunakan Next.js (SSR), gunakan ini agar tidak error hydration
+      skipHydration: true, 
     }
-    set({ user, token, isAuthenticated: true, isLoading: false });
-  },
-
-  setUser: (user) => set({ user }),
-
-  logout: () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("auth_token");
-    }
-    set({ user: null, token: null, isAuthenticated: false, isLoading: false });
-  },
-
-  setLoading: (isLoading) => set({ isLoading }),
-}));
+  )
+);

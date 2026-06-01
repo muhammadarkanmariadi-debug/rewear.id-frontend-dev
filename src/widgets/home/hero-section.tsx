@@ -22,119 +22,8 @@ const STATS = [
   { value: "30,000+", label: "Happy Customers" },
 ];
 
-const BRANDS = [
-  { name: "VERSACE", image: "/assets/images/logo/brand1.png" },
-  { name: "ZARA", image: "/assets/images/logo/brand2.png" },
-  { name: "GUCCI", image: "/assets/images/logo/brand3.png" },
-  { name: "PRADA", image: "/assets/images/logo/brand4.png" },
-  { name: "Calvin Klein", image: "/assets/images/logo/brand5.png" },
-];
 
-/* Reusable brand logo item — consistent size across all breakpoints */
-function BrandLogo({ brand }: { brand: (typeof BRANDS)[number] }) {
-  return (
-    <div
-      className="flex items-center justify-center"
-      style={{ width: 110, height: 44 }}
-    >
-      <img
-        src={brand.image}
-        alt={brand.name}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          objectPosition: "center",
-          filter: "brightness(0) invert(1)",
-        }}
-      />
-    </div>
-  );
-}
 
-/* Reusable left-side content — accepts sizing props per breakpoint */
-function HeroContent({
-  headlineClass,
-  subClass,
-  badgeClass,
-  statClass,
-  ctaClass,
-}: {
-  headlineClass: string;
-  subClass?: string;
-  badgeClass?: string;
-  statClass: string;
-  ctaClass: string;
-}) {
-  return (
-    <>
-      {/* Escrow badge */}
-      <div
-        className={`inline-flex items-center gap-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm w-fit ${badgeClass ?? "mb-6"}`}
-      >
-        <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-        100% Aman dengan Escrow
-      </div>
-
-      {/* Headline */}
-      <h1
-        className={`font-black uppercase leading-[0.88] tracking-tight text-foreground ${headlineClass}`}
-        style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
-      >
-        Find Clothes
-        <br />
-        That Matches
-        <br />
-        Your Style
-      </h1>
-
-      {/* Subtext */}
-      <p
-        className={`mt-4 text-[13px] leading-relaxed text-muted-foreground ${subClass ?? "max-w-[360px]"}`}
-      >
-        Browse through our diverse range of meticulously crafted garments,
-        designed to bring out your individuality and cater to your sense of
-        style.
-      </p>
-
-      {/* CTA */}
-      <div className={`mt-6 flex gap-3 ${ctaClass}`}>
-        <Link
-          href="/products"
-          className="inline-flex items-center justify-center rounded-full bg-foreground px-7 py-3 text-sm font-semibold text-background hover:bg-foreground/85 transition-colors"
-        >
-          Shop Now
-        </Link>
-        <Link
-          href="/seller"
-          className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-7 py-3 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors"
-        >
-          Jual Sekarang
-        </Link>
-      </div>
-
-      {/* Stats */}
-      <div className={`mt-8 flex items-stretch divide-x divide-border ${statClass}`}>
-        {STATS.map((stat) => (
-          <div
-            key={stat.label}
-            className="pr-6 first:pl-0 [&:not(:first-child)]:pl-6"
-          >
-            <p
-              className="text-[1.5rem] font-black leading-none text-foreground"
-              style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
-            >
-              {stat.value}
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              {stat.label}
-            </p>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
 
 export function HeroSection() {
   return (
@@ -142,7 +31,7 @@ export function HeroSection() {
       {/* ═══════════════════════════════════════════════════════════
           HERO
       ═══════════════════════════════════════════════════════════ */}
-      <section className="relative bg-[#F2F2F0] overflow-hidden">
+      <section className="relative bg-background overflow-hidden">
 
         {/* ── MOBILE < lg ──────────────────────────────────────── */}
         <div className="lg:hidden flex flex-col">
@@ -194,8 +83,10 @@ export function HeroSection() {
 
           {/* Hero image */}
           <div className="relative w-full" style={{ height: "360px" }}>
-            <Image src="/assets/images/hero-mobile.png" alt="Fashion model" fill priority className="object-cover object-top" sizes="100vw" />
-            <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#F2F2F0] to-transparent pointer-events-none" />
+            <Image src="/assets/images/hero.png" alt="Fashion model" fill priority className="object-cover object-top" sizes="100vw" />
+            
+            <StarIcon className="absolute top-8 right-8 w-9 h-9 text-foreground z-10" />
+            <StarIcon className="absolute top-[50%] left-[12%] w-5 h-5 text-foreground z-10" />
           </div>
         </div>
 
@@ -246,14 +137,14 @@ export function HeroSection() {
           {/* Right image — fills remaining space */}
           <div className="relative flex-1 min-w-0">
             <Image
-              src="/assets/images/hero-mobile.png"
+              src="/assets/images/hero.png"
               alt="Fashion model"
               fill
               priority
               className="object-cover object-top"
               sizes="50vw"
             />
-            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#F2F2F0] to-transparent pointer-events-none" />
+          
             <StarIcon className="absolute top-8 right-8 w-9 h-9 text-foreground z-10" />
             <StarIcon className="absolute top-[50%] left-[12%] w-5 h-5 text-foreground z-10" />
           </div>
@@ -271,7 +162,7 @@ export function HeroSection() {
               </div>
 
               <h1
-                className="text-[clamp(3rem,4.2vw,5rem)] font-black uppercase leading-[0.88] tracking-tight text-foreground"
+                className="text-[clamp(3rem,4.2vw,4.2rem)] font-black uppercase leading-[0.88] tracking-tight text-foreground"
                 style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
               >
                 Find Clothes<br />That Matches<br />Your Style
@@ -305,8 +196,8 @@ export function HeroSection() {
 
             {/* Right image */}
             <div className="relative flex-1 min-w-0 overflow-hidden">
-              <Image src="/assets/images/hero-mobile.png" alt="Fashion model" fill priority className="object-cover object-top" sizes="50vw" />
-              <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#F2F2F0] to-transparent pointer-events-none" />
+              <Image src="/assets/images/hero.png" alt="Fashion model" fill priority className="object-cover object-top" sizes="50vw" />
+             
               <StarIcon className="absolute top-10 right-[8%] w-11 h-11 text-foreground z-10" />
               <StarIcon className="absolute top-[52%] left-[8%] w-6 h-6 text-foreground z-10" />
             </div>
@@ -314,61 +205,7 @@ export function HeroSection() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
-          BRAND TICKER
-      ═══════════════════════════════════════════════════════════ */}
-      <div className="bg-foreground text-background overflow-hidden py-8">
 
-        {/* Mobile: 3-col grid, last item centered if odd */}
-        <div className="lg:hidden grid grid-cols-3 justify-items-center items-center gap-y-6 px-4">
-          {BRANDS.map((brand, i) => {
-            const isLast = i === BRANDS.length - 1;
-            const isOddTotal = BRANDS.length % 2 !== 0;
-            const isCentered = isLast && isOddTotal;
-            return (
-              <div
-                key={i}
-                className={`flex items-center justify-center ${isCentered ? "col-span-3" : "col-span-1"}`}
-                style={{ width: 96, height: 40 }}
-              >
-                <img
-                  src={brand.image}
-                  alt={brand.name}
-                  style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", filter: "brightness(0) invert(1)" }}
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Tablet: static row centered */}
-        <div className="hidden lg:flex xl:hidden items-center justify-center gap-10 px-10">
-          {BRANDS.map((brand, i) => (
-            <div key={i} className="flex items-center justify-center" style={{ width: 100, height: 40 }}>
-              <img
-                src={brand.image}
-                alt={brand.name}
-                style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", filter: "brightness(0) invert(1)" }}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop: marquee */}
-        <div className="hidden xl:block">
-          <div className="flex animate-marquee whitespace-nowrap items-center">
-            {[...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS].map((brand, i) => (
-              <div key={i} className="mx-10 flex items-center justify-center" style={{ width: 110, height: 44 }}>
-                <img
-                  src={brand.image}
-                  alt={brand.name}
-                  style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", filter: "brightness(0) invert(1)" }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

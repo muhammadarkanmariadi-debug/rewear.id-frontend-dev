@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
-import { MOCK_PRODUCTS } from "@/configs/mock-data";
+import { productService } from "@/services";
 import { ProductGallery } from "@/widgets/product/product-gallery";
 import { SellerMiniProfile } from "@/widgets/product/seller-mini-profile";
 import { ShippingEstimator } from "@/widgets/product/shipping-estimator";
 import { formatRupiah } from "@/shared/utils/format";
 import { ShieldCheck, Heart, Share2, Info, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { BookmarkButton } from "@/widgets/product/bookmark-button";
 import { Metadata } from "next";
+import { Product } from "@/entities";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -14,7 +16,8 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = MOCK_PRODUCTS.find(p => p.slug === slug);
+  const res = await productService.getById(slug);
+  const product = res.data;
   
   if (!product) return { title: "Produk Tidak Ditemukan" };
   
@@ -26,7 +29,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = MOCK_PRODUCTS.find(p => p.slug === slug);
+  const res = await productService.getById(slug);
+  const product:Product = res.data;
 
   if (!product) {
     notFound();
@@ -45,12 +49,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         
         {/* L E F T  C O L U M N : Gallery & Description (Spans 7 cols) */}
         <div className="flex flex-col gap-8 lg:col-span-7">
-          <ProductGallery images={product.images} alt={product.title} />
+          <ProductGallery 
+            images={product?.images?.map((img: any) => img.image_url) || []} 
+            alt={product.title || "Produk"} 
+          />
           
           {/* Mobile Product Title (Shown only on small screens below gallery) */}
           <div className="lg:hidden">
             <h1 className="mb-2 font-bold text-2xl tracking-tight">{product.title}</h1>
-            <p className="mb-4 font-bold text-foreground text-xl">{formatRupiah(product.price)}</p>
+            <p className="mb-4 font-bold text-foreground text-xl">{formatRupiah(Number(product.price || 0))}</p>
           </div>
 
           <div className="pt-8 border-border border-t">
@@ -62,11 +69,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             <div className="gap-y-4 grid grid-cols-2 bg-surface-container-low mb-8 p-5 border border-border/50 rounded-xl text-sm">
               <div>
                 <p className="mb-1 text-muted-foreground">Kategori</p>
-                <p className="font-semibold capitalize">{product.category}</p>
+                <p className="font-semibold capitalize">{product.category?.name || "Lainnya"}</p>
               </div>
               <div>
                 <p className="mb-1 text-muted-foreground">Merek</p>
-                <p className="font-semibold uppercase">{product.brand || "Unbranded"}</p>
+                <p className="font-semibold uppercase">{product.brand?.name || "Unbranded"}</p>
               </div>
               <div>
                 <p className="mb-1 text-muted-foreground">Ukuran</p>
@@ -75,7 +82,10 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               <div>
                 <p className="mb-1 text-muted-foreground">Kondisi</p>
                 <p className="font-bold text-foreground">
-                  {product.condition === "baru" ? "Baru dengan Tag" : "Bekas"}
+                  {product.condition === "new_with_tag" ? "Baru dengan Tag" : 
+                   product.condition === "like_new" ? "Bekas Seperti Baru" :
+                   product.condition === "good" ? "Bekas Baik" :
+                   product.condition === "fair" ? "Bekas Layak" : "Bekas"}
                 </p>
               </div>
             </div>
@@ -95,10 +105,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             <div className="bg-card shadow-sm p-6 border border-border rounded-2xl">
               <div className="hidden lg:block mb-4">
                 <h1 className="mb-2 font-bold text-2xl leading-snug tracking-tight">{product.title}</h1>
-                <p className="font-bold text-foreground text-3xl">{formatRupiah(product.price)}</p>
+                <p className="font-bold text-foreground text-3xl">{formatRupiah(Number(product.price || 0))}</p>
               </div>
 
-              {/* Escrow Guarantee Banner */}
               <div className="flex items-start gap-3 bg-green-500/10 mb-6 p-4 border border-green-500/20 rounded-xl">
                 <ShieldCheck className="w-6 h-6 text-green-500 shrink-0" />
                 <div>
@@ -109,13 +118,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-3">
-                <Link href={`/checkout/${product.slug}`} className="flex justify-center items-center bg-foreground hover:bg-foreground/90 shadow-md hover:shadow-lg rounded-xl w-full h-12 font-bold text-background transition-all">
+                <Link href={`/checkout/${product.slug || product.id}`} className="flex justify-center items-center bg-foreground hover:bg-foreground/90 shadow-md hover:shadow-lg rounded-xl w-full h-12 font-bold text-background transition-all">
                   Beli Sekarang
                 </Link>
                 <div className="flex gap-3">
-                  <button className="flex flex-1 justify-center items-center gap-2 bg-surface-container hover:bg-accent border border-border rounded-xl h-12 font-semibold text-foreground transition-all">
-                    <Heart className="w-4 h-4" /> Wishlist
-                  </button>
+                  <BookmarkButton productId={product.id} initialStatus={product.is_bookmarked ?? false} />
                   <button className="flex justify-center items-center bg-surface-container hover:bg-accent border border-border rounded-xl w-12 h-12 font-semibold text-foreground transition-all shrink-0">
                     <Share2 className="w-4 h-4" />
                   </button>
@@ -124,9 +131,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             </div>
 
             {/* Seller Info */}
-            <SellerMiniProfile seller={product.seller} />
-
-       
+            {product.seller && <SellerMiniProfile seller={product.seller} />}
 
           </div>
         </div>
@@ -135,3 +140,4 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     </div>
   );
 }
+

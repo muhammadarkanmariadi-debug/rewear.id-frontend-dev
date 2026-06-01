@@ -10,8 +10,6 @@ export type {
 // Domain entities
 export type {
   User,
-  UserProfile,
-  UserRole,
   SellerVerification,
   LoginRequest,
   RegisterRequest,
@@ -20,15 +18,16 @@ export type {
 
 export type {
   Product,
-  ProductCategory,
   ProductCondition,
-  ListingStatus as ProductStatus,
-  ProductSize,
+  ProductStatus,
   ProductFilterParams,
   CreateProductRequest,
+  Category,
+  Brand,
+  ProductImage,
 } from "./product";
 
-export type { Order, EscrowStatus as OrderEscrowStatus, CreateOrderRequest } from "./order";
+export type { Order, OrderStatus, CreateOrderRequest } from "./order";
 
 export type { EscrowTransaction, EscrowStatus } from "./escrow";
 export { ESCROW_STATUS_LABELS } from "./escrow";
@@ -71,3 +70,8 @@ export type {
   DisputeStatus,
   CreateDisputeRequest,
 } from "./dispute";
+
+export type { Address, AddressRequest } from "./address";
+
+export type { BankAccount, CreateBankAccountRequest } from "./bank-account";
+

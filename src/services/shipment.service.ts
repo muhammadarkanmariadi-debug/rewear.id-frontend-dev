@@ -1,34 +1,17 @@
-import { httpClient } from "./http-client";
+import { httpGet, httpPost } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type {
-  ApiResponse,
-  Shipment,
-  ShippingCostRequest,
-  ShippingCostOption,
-  TrackingEvent,
-} from "@/entities";
 
 export const shipmentService = {
-  async addTracking(orderId: string, trackingNumber: string) {
-    const res = await httpClient.post<ApiResponse<Shipment>>(
-      API_ENDPOINTS.SHIPMENTS,
-      { order_id: orderId, tracking_number: trackingNumber },
-    );
-    return res.data.data;
+  async addTracking(orderId: string, courier: string, service: string, trackingNumber: string) {
+    const payload = await encryptClientPayload(JSON.stringify({ courier, service, tracking_number: trackingNumber }));
+    return httpPost(API_ENDPOINTS.SELLER_ORDER_SHIP(orderId), payload, "token");
   },
-
-  async getShippingCost(data: ShippingCostRequest) {
-    const res = await httpClient.post<ApiResponse<ShippingCostOption[]>>(
-      API_ENDPOINTS.SHIPPING_COST,
-      data,
-    );
-    return res.data.data;
+  async getShippingCost(data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPost(API_ENDPOINTS.SHIPPING_COST, payload, "token");
   },
-
   async track(shipmentId: string) {
-    const res = await httpClient.get<ApiResponse<TrackingEvent[]>>(
-      API_ENDPOINTS.SHIPMENT_TRACK(shipmentId),
-    );
-    return res.data.data;
+    return httpGet(API_ENDPOINTS.SHIPMENT_TRACK(shipmentId), "token");
   },
 };

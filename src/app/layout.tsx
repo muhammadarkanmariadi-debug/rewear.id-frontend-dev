@@ -4,6 +4,7 @@ import { QueryProvider } from "@/shared/providers/query-provider";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import AuthProvider from "@/shared/providers/auth-provider";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -32,11 +33,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${hanken.variable} antialiased`}
       >
+        <AuthProvider>
         <ThemeProvider>
           <QueryProvider>
             {children}
           </QueryProvider>
         </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
