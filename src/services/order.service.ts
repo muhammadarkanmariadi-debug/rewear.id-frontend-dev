@@ -1,41 +1,23 @@
-import { httpClient } from "./http-client";
+import { httpGet, httpPost } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type {
-  ApiResponse,
-  PaginatedResponse,
-  Order,
-  CreateOrderRequest,
-  PaginationParams,
-} from "@/entities";
 
 export const orderService = {
-  async getAll(params?: PaginationParams) {
-    const res = await httpClient.get<PaginatedResponse<Order>>(
-      API_ENDPOINTS.ORDERS,
-      { params },
-    );
-    return res.data;
+  async getAll(params?: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.ORDERS, "token", undefined, params);
   },
-
+  async getSellerOrders(params?: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.SELLER_ORDERS, "token", undefined, params);
+  },
   async getById(id: string) {
-    const res = await httpClient.get<ApiResponse<Order>>(
-      API_ENDPOINTS.ORDER_DETAIL(id),
-    );
-    return res.data.data;
+    return httpGet(API_ENDPOINTS.ORDER_DETAIL(id), "token");
   },
-
-  async create(data: CreateOrderRequest) {
-    const res = await httpClient.post<ApiResponse<Order>>(
-      API_ENDPOINTS.ORDERS,
-      data,
-    );
-    return res.data.data;
+  async create(data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPost(API_ENDPOINTS.ORDERS, payload, "token");
   },
-
   async confirmDelivery(id: string) {
-    const res = await httpClient.post<ApiResponse<Order>>(
-      API_ENDPOINTS.ORDER_CONFIRM_RECEIVED(id),
-    );
-    return res.data.data;
+    const payload = await encryptClientPayload(JSON.stringify({}));
+    return httpPost(API_ENDPOINTS.ORDER_CONFIRM_RECEIVED(id), payload, "token");
   },
 };

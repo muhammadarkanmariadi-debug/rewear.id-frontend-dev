@@ -1,58 +1,29 @@
-import { httpClient } from "./http-client";
+import { httpGet, httpPost, httpPut, httpDelete } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type {
-  ApiResponse,
-  PaginatedResponse,
-  Product,
-  ProductFilterParams,
-  CreateProductRequest,
-  PaginationParams,
-} from "@/entities";
 
 export const productService = {
-  async getAll(params?: ProductFilterParams & PaginationParams) {
-    const res = await httpClient.get<PaginatedResponse<Product>>(
-      API_ENDPOINTS.PRODUCTS,
-      { params },
-    );
-    return res.data;
+  async getAll(params?: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.PRODUCTS, undefined, undefined, params);
   },
-
-  async getById(id: string) {
-    const res = await httpClient.get<ApiResponse<Product>>(
-      API_ENDPOINTS.PRODUCT_DETAIL(id),
-    );
-    return res.data.data;
+  async getSellerProducts(params?: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.SELLER_PRODUCTS, "token", undefined, params);
   },
-
-  async create(data: CreateProductRequest) {
-    const res = await httpClient.post<ApiResponse<Product>>(
-      API_ENDPOINTS.SELLER_PRODUCTS,
-      data,
-    );
-    return res.data.data;
+  async getById(slug: string) {
+    return httpGet(API_ENDPOINTS.PRODUCT_DETAIL(slug), "token");
   },
-
-  async update(id: string, data: Partial<CreateProductRequest>) {
-    const res = await httpClient.put<ApiResponse<Product>>(
-      API_ENDPOINTS.SELLER_PRODUCT_DETAIL(id),
-      data,
-    );
-    return res.data.data;
+  async create(data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPost(API_ENDPOINTS.SELLER_PRODUCTS, payload, "token");
   },
-
-  async delete(id: string) {
-    await httpClient.delete(API_ENDPOINTS.SELLER_PRODUCT_DETAIL(id));
+  async update(id: string, data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPut(API_ENDPOINTS.SELLER_PRODUCT_DETAIL(id), payload, "token");
   },
-
-  async uploadImages(productId: string, images: File[]) {
-    const formData = new FormData();
-    images.forEach((image) => formData.append("images[]", image));
-    const res = await httpClient.post<ApiResponse<Product>>(
-      API_ENDPOINTS.SELLER_PRODUCT_IMAGES(productId),
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data.data;
+  async remove(id: string) {
+    return httpDelete(API_ENDPOINTS.SELLER_PRODUCT_DETAIL(id), "token");
+  },
+  async uploadImages(productId: string, formData: FormData) {
+    return httpPost(API_ENDPOINTS.SELLER_PRODUCT_IMAGES(productId), formData, "token");
   },
 };

@@ -1,33 +1,36 @@
 import { Product } from "./product";
 import { User } from "./user";
 
-export type EscrowStatus =
-  | "PENDING"
-  | "PAID"
-  | "IN_DELIVERY"
-  | "DELIVERED"
-  | "COMPLETED"
-  | "DISPUTED"
-  | "REFUNDED"
-  | "AUTO_COMPLETED";
+export type OrderStatus =
+  | "pending_payment"
+  | "paid"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "completed"
+  | "cancelled"
+  | "disputed"
+  | "refunded";
 
 export interface Order {
   id: string;
-  product: Product;
+  order_number: string;
   buyer: User;
   seller: User;
-  totalAmount: number;
-  shippingCost: number;
-  shippingCourier: string;
-  trackingNumber?: string;
-  escrowStatus: EscrowStatus;
-  createdAt: string;
-  deliveredAt?: string;
-  completedAt?: string;
+  product: Product;
+  product_price: number;
+  shipping_cost: number;
+  service_fee: number;
+  total_amount: number;
+  status: OrderStatus;
+  notes: string | null;
+  created_at: string;
 }
 
 export interface CreateOrderRequest {
-  productId: string;
-  shippingCourier: string;
-  shippingCost: number;
+  product_id: string;
+  shipping_address_id: string;
+  courier: "jne" | "jnt" | "sicepat" | "anteraja";
+  service: string;
+  notes?: string;
 }

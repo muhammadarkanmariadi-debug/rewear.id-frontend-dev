@@ -14,7 +14,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout, user } = useAuthStore();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -96,18 +96,29 @@ export function Navbar() {
           <div className="hidden sm:block mx-1 bg-border w-px h-6" />
 
           {isMounted && isAuthenticated ? (
-            <button onClick={logout} className="hidden md:inline-flex items-center gap-2 hover:bg-red-500/10 px-3 py-2 rounded-md font-medium text-muted-foreground hover:text-red-500 text-sm transition-colors">
-              <LogOut className="w-4 h-4" />
-              Keluar
-            </button>
+            <div className="hidden md:flex items-center gap-2">
+              <Link href="/dashboard" className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.name} className="w-7 h-7 rounded-full object-cover" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                    {user?.name?.charAt(0)}
+                  </div>
+                )}
+                <span className="text-sm font-medium pr-1">{user?.name}</span>
+              </Link>
+              <button onClick={logout} title="Keluar" className="flex items-center justify-center hover:bg-red-500/10 w-9 h-9 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           ) : (
-            <Link href="/login" className="hidden md:inline-flex items-center gap-2 hover:bg-muted px-3 py-2 rounded-md font-medium text-muted-foreground hover:text-foreground text-sm transition-colors">
+            <Link href="/login" className="hidden lg:inline-flex items-center gap-2 hover:bg-muted px-3 py-2 rounded-md font-medium text-muted-foreground hover:text-foreground text-sm transition-colors">
               <User className="w-4 h-4" />
               Masuk
             </Link>
           )}
 
-          <Link href="/products/new" className="hidden sm:inline-flex justify-center items-center bg-foreground hover:bg-foreground/90 shadow-sm px-4 rounded-full h-9 font-medium text-background text-sm transition-colors">
+          <Link href="/products/new" className="hidden lg:inline-flex justify-center items-center bg-foreground hover:bg-foreground/90 shadow-sm px-4 rounded-full h-9 font-medium text-background text-sm transition-colors">
             Jual Baju
           </Link>
 
@@ -116,7 +127,7 @@ export function Navbar() {
           {/* Mobile Menu Toggle Button */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden z-50 flex justify-center items-center hover:bg-muted rounded-md w-9 h-9 text-foreground transition-colors"
+            className="lg:hidden z-50 flex justify-center items-center hover:bg-muted rounded-md w-9 h-9 text-foreground transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -126,7 +137,7 @@ export function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden top-16 right-0 left-0 absolute flex flex-col gap-6 bg-background/95 slide-in-from-top-4 shadow-2xl backdrop-blur-md p-5 border-border/40 border-b animate-in">
+        <div className="lg:hidden top-16 right-0 left-0 absolute flex flex-col gap-6 bg-background/95 slide-in-from-top-4 shadow-2xl backdrop-blur-md p-5 border-border/40 border-b animate-in">
           <div className="group relative w-full">
             <div className="left-0 absolute inset-y-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
               <Search className="w-4 h-4" />
@@ -181,10 +192,25 @@ export function Navbar() {
             </Link>
 
             {isMounted && isAuthenticated ? (
-              <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="flex justify-center items-center gap-2 bg-red-500/10 hover:bg-red-500/20 p-3 rounded-lg font-medium text-red-500 text-sm transition-colors">
-                <LogOut className="w-4 h-4" />
-                Keluar Akun
-              </button>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg uppercase">
+                      {user?.name?.charAt(0)}
+                    </div>
+                  )}
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <span className="font-semibold text-sm truncate">{user?.name}</span>
+                    <span className="text-xs text-muted-foreground truncate">{user?.email}</span>
+                  </div>
+                </div>
+                <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="flex justify-center items-center gap-2 bg-red-500/10 hover:bg-red-500/20 p-3 rounded-lg font-medium text-red-500 text-sm transition-colors">
+                  <LogOut className="w-4 h-4" />
+                  Keluar Akun
+                </button>
+              </div>
             ) : (
               <div className="gap-3 grid grid-cols-2">
                 <Link onClick={() => setIsMobileMenuOpen(false)} href="/login" className="flex justify-center items-center bg-muted hover:bg-muted/80 p-3 rounded-lg font-medium text-sm transition-colors">

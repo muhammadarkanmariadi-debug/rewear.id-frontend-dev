@@ -5,11 +5,35 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShieldCheck } from "lucide-react";
 
+import { useState } from "react";
+import { bookmarkService } from "@/services";
+
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [isBookmarked, setIsBookmarked] = useState(product.is_bookmarked ?? false);
+  const [loading, setLoading] = useState(false);
+
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.preventDefault(); // prevent next/link redirect
+    if (loading) return;
+    
+    setLoading(true);
+    const prev = isBookmarked;
+    setIsBookmarked(!prev);
+    
+    try {
+      const res = await bookmarkService.toggle(product.id);
+      if (!res.status) setIsBookmarked(prev);
+    } catch {
+      setIsBookmarked(prev);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Link
       href={`/products/${product.slug}`}
@@ -18,7 +42,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image Container */}
       <div className="relative bg-surface-container w-full aspect-[3/4] overflow-hidden">
         <Image
-          src={product.images[0]}
+          src={product.images[0]?.image_url || '/images/hero.png'}
           alt={product.title}
           fill
           className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
@@ -31,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Top badges */}
         <div className="top-2.5 right-2.5 left-2.5 absolute flex justify-between items-center">
           <span className="bg-background/90 backdrop-blur-sm px-2 py-1 border border-border/50 rounded-md font-bold text-[9px] text-foreground uppercase tracking-[0.12em]">
-            {product.condition === "baru" ? "Baru" : "Preloved"}
+            {product.condition === "new_with_tag" ? "Baru" : "Preloved"}
           </span>
           <span
             className="bg-green-500/90 backdrop-blur-sm p-1.5 rounded-full text-white"
@@ -48,17 +72,22 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1 min-w-0">
             <p className="mb-0.5 font-semibold text-[10px] text-muted-foreground/70 uppercase tracking-[0.15em]">
-              {product.brand || "Unbranded"}
+              {product.brand?.name || "Unbranded"}
             </p>
             <h3 className="font-medium text-foreground text-sm line-clamp-2 leading-snug">
               {product.title}
             </h3>
           </div>
           <button
-            onClick={(e) => e.preventDefault()}
-            className="flex justify-center items-center hover:bg-red-50/10 mt-0.5 rounded-full w-7 h-7 text-muted-foreground/50 hover:text-red-400 transition-colors shrink-0"
+            onClick={handleBookmark}
+            disabled={loading}
+            className={`flex justify-center items-center mt-0.5 rounded-full w-7 h-7 transition-colors shrink-0 ${
+              isBookmarked
+                ? "bg-red-50 text-red-500 hover:bg-red-100"
+                : "text-muted-foreground/50 hover:bg-red-50/10 hover:text-red-400"
+            }`}
           >
-            <Heart className="w-3.5 h-3.5" />
+            <Heart className={`w-3.5 h-3.5 ${isBookmarked ? "fill-current" : ""}`} />
           </button>
         </div>
 

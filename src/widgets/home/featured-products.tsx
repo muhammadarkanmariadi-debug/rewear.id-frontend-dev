@@ -1,14 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ShieldCheck, Heart } from "lucide-react";
-import { MOCK_PRODUCTS } from "@/configs/mock-data";
+import { productService } from "@/services";
 import { formatRupiah } from "@/shared/utils/format";
 import { ProductCard } from "../marketplace/product-card";
 
-export function FeaturedProducts() {
-  const featured = MOCK_PRODUCTS.slice(0, 8); // Display first 8 products
+export async function FeaturedProducts() {
+  let featured = [];
+  try {
+    const res = await productService.getAll({ per_page: "8" });
 
-  return (
+    featured = res?.data || [];
+  
+  } catch (error) {
+    console.error("Failed to fetch featured products:", error);
+  }
+
+  return featured.length > 0 ? (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col sm:flex-row justify-between items-end mb-10 gap-4">
@@ -22,11 +30,11 @@ export function FeaturedProducts() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {featured.map((product) => (
+          {featured.map((product: any) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>
     </section>
-  );
+  ) : null;
 }

@@ -1,38 +1,35 @@
-import { httpClient } from "./http-client";
+import { httpPost, httpGet, httpLogin } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User } from "@/entities";
 
 export const authService = {
-  async login(data: LoginRequest) {
-    const res = await httpClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_LOGIN,
-      data,
-    );
-    return res.data.data;
+  async login(email: string, password: string) {
+    const payload = await encryptClientPayload(JSON.stringify({ email, password }));
+    return httpLogin(API_ENDPOINTS.AUTH_LOGIN, payload);
   },
-
-  async register(data: RegisterRequest) {
-    const res = await httpClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_REGISTER,
-      data,
-    );
-    return res.data.data;
+  async register(name: string, email: string, password: string, password_confirmation: string) {
+    const payload = await encryptClientPayload(JSON.stringify({ name, email, password, password_confirmation }));
+    return httpPost(API_ENDPOINTS.AUTH_REGISTER, payload);
   },
-
   async logout() {
-    await httpClient.post(API_ENDPOINTS.AUTH_LOGOUT);
+    return httpPost(API_ENDPOINTS.AUTH_LOGOUT, "{}", "token");
   },
-
   async getMe() {
-    const res = await httpClient.get<ApiResponse<User>>(API_ENDPOINTS.AUTH_ME);
-    return res.data.data;
+    return httpGet(API_ENDPOINTS.AUTH_ME, "token");
   },
-
   async googleOAuth(token: string) {
-    const res = await httpClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_GOOGLE,
-      { token },
-    );
-    return res.data.data;
+    const payload = await encryptClientPayload(JSON.stringify({ token }));
+    return httpPost(API_ENDPOINTS.AUTH_GOOGLE, payload);
+  },
+  async forgotPassword(email: string) {
+    const payload = await encryptClientPayload(JSON.stringify({ email }));
+    return httpPost(API_ENDPOINTS.AUTH_FORGOT_PASSWORD, payload);
+  },
+  async resetPassword(data: Record<string, unknown>) {
+    const payload = await encryptClientPayload(JSON.stringify(data));
+    return httpPost(API_ENDPOINTS.AUTH_RESET_PASSWORD, payload);
+  },
+  async verifyEmail(id: string, hash: string, query: Record<string, string>) {
+    return httpGet(API_ENDPOINTS.AUTH_VERIFY_EMAIL(id, hash), undefined, undefined, query);
   },
 };

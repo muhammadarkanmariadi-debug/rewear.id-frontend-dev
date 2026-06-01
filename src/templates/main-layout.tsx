@@ -3,6 +3,7 @@ import { Navbar } from "@/widgets/navbar";
 import { Footer } from "@/widgets/footer";
 
 export function MainLayout({ children }: { children: ReactNode }) {
+  
   return (
     <div className="flex min-h-screen flex-col font-sans relative">
       {/* Premium Ambient Background */}

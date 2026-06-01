@@ -19,8 +19,6 @@ export interface Withdrawal extends Timestamps {
 }
 
 export interface CreateWithdrawalRequest {
+  bank_account_id: string;
   amount: number;
-  bank_name: string;
-  account_number: string;
-  account_holder: string;
 }

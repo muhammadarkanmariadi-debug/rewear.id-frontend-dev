@@ -1,20 +1,13 @@
-import { httpClient } from "./http-client";
+import { httpPost, httpGet } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type { ApiResponse, Payment } from "@/entities";
 
 export const paymentService = {
   async initiate(orderId: string) {
-    const res = await httpClient.post<ApiResponse<Payment>>(
-      API_ENDPOINTS.PAYMENTS,
-      { order_id: orderId },
-    );
-    return res.data.data;
+    const payload = await encryptClientPayload(JSON.stringify({}));
+    return httpPost(API_ENDPOINTS.PAYMENTS(orderId), payload, "token");
   },
-
   async getStatus(paymentId: string) {
-    const res = await httpClient.get<ApiResponse<Payment>>(
-      API_ENDPOINTS.PAYMENT_STATUS(paymentId),
-    );
-    return res.data.data;
+    return httpGet(API_ENDPOINTS.PAYMENT_STATUS(paymentId), "token");
   },
 };

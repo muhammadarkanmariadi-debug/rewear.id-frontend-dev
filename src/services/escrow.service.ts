@@ -1,31 +1,23 @@
-import { httpClient } from "./http-client";
+import { httpGet, httpPost } from "@/lib/http-client";
+import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import type { ApiResponse, EscrowTransaction } from "@/entities";
 
 export const escrowService = {
   async getStatus(orderId: string) {
-    const res = await httpClient.get<ApiResponse<EscrowTransaction>>(
-      API_ENDPOINTS.ESCROW_STATUS(orderId),
-    );
-    return res.data.data;
+    return httpGet(API_ENDPOINTS.ESCROW_CONFIRM_RECEIPT(orderId), "token");
   },
-
   async confirmReceipt(orderId: string) {
-    const res = await httpClient.post<ApiResponse<EscrowTransaction>>(
-      API_ENDPOINTS.ESCROW_CONFIRM_RECEIPT(orderId),
-    );
-    return res.data.data;
+    const payload = await encryptClientPayload(JSON.stringify({}));
+    return httpPost(API_ENDPOINTS.ESCROW_CONFIRM_RECEIPT(orderId), payload, "token");
   },
-
   async openDispute(orderId: string, reason: string, evidence?: File[]) {
     const formData = new FormData();
     formData.append("reason", reason);
     evidence?.forEach((file) => formData.append("evidence[]", file));
-    const res = await httpClient.post<ApiResponse<EscrowTransaction>>(
-      API_ENDPOINTS.ESCROW_DISPUTE(orderId),
+    return httpPost(
+      API_ENDPOINTS.ESCROW_CONFIRM_RECEIPT(orderId).replace("confirm-received", "dispute"),
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
+      "token"
     );
-    return res.data.data;
   },
 };

@@ -4,31 +4,13 @@ export interface User extends Timestamps {
   id: string;
   name: string;
   email: string;
-  username: string;
-  avatar_url: string | null;
-  bio: string | null;
   phone: string | null;
-  role: UserRole;
-  is_verified: boolean;
-  seller_rating: number;
-  buyer_rating: number;
-  total_sales: number;
-  
-  total_purchases: number;
-}
-
-export type UserRole = "buyer" | "seller" | "admin";
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  username: string;
   avatar_url: string | null;
   bio: string | null;
-  seller_rating: number;
-  total_sales: number;
-  is_verified: boolean;
-  joined_at: string;
+  is_seller: boolean;
+  is_seller_verified: boolean;
+  rating_avg: number;
+  rating_count: number;
 }
 
 export interface SellerVerification extends Timestamps {
@@ -47,9 +29,9 @@ export interface LoginRequest {
 export interface RegisterRequest {
   name: string;
   email: string;
-  username: string;
   password: string;
   password_confirmation: string;
+  phone?: string;
 }
 
 export interface AuthResponse {
