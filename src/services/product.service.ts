@@ -27,7 +27,7 @@ export const productService = {
 
   async create(data: CreateProductRequest) {
     const res = await httpClient.post<ApiResponse<Product>>(
-      API_ENDPOINTS.PRODUCTS,
+      API_ENDPOINTS.SELLER_PRODUCTS,
       data,
     );
     return res.data.data;
@@ -35,21 +35,21 @@ export const productService = {
 
   async update(id: string, data: Partial<CreateProductRequest>) {
     const res = await httpClient.put<ApiResponse<Product>>(
-      API_ENDPOINTS.PRODUCT_DETAIL(id),
+      API_ENDPOINTS.SELLER_PRODUCT_DETAIL(id),
       data,
     );
     return res.data.data;
   },
 
   async delete(id: string) {
-    await httpClient.delete(API_ENDPOINTS.PRODUCT_DETAIL(id));
+    await httpClient.delete(API_ENDPOINTS.SELLER_PRODUCT_DETAIL(id));
   },
 
   async uploadImages(productId: string, images: File[]) {
     const formData = new FormData();
     images.forEach((image) => formData.append("images[]", image));
     const res = await httpClient.post<ApiResponse<Product>>(
-      API_ENDPOINTS.PRODUCT_IMAGES(productId),
+      API_ENDPOINTS.SELLER_PRODUCT_IMAGES(productId),
       formData,
       { headers: { "Content-Type": "multipart/form-data" } },
     );

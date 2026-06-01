@@ -1,74 +1,374 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+
+function StarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 0 C12 6.627 6.627 12 0 12 C6.627 12 12 17.373 12 24 C12 17.373 17.373 12 24 12 C17.373 12 12 6.627 12 0Z" />
+    </svg>
+  );
+}
+
+const STATS = [
+  { value: "200+", label: "International Brands" },
+  { value: "2,000+", label: "High-Quality Products" },
+  { value: "30,000+", label: "Happy Customers" },
+];
+
+const BRANDS = [
+  { name: "VERSACE", image: "/assets/images/logo/brand1.png" },
+  { name: "ZARA", image: "/assets/images/logo/brand2.png" },
+  { name: "GUCCI", image: "/assets/images/logo/brand3.png" },
+  { name: "PRADA", image: "/assets/images/logo/brand4.png" },
+  { name: "Calvin Klein", image: "/assets/images/logo/brand5.png" },
+];
+
+/* Reusable brand logo item — consistent size across all breakpoints */
+function BrandLogo({ brand }: { brand: (typeof BRANDS)[number] }) {
+  return (
+    <div
+      className="flex items-center justify-center"
+      style={{ width: 110, height: 44 }}
+    >
+      <img
+        src={brand.image}
+        alt={brand.name}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          objectPosition: "center",
+          filter: "brightness(0) invert(1)",
+        }}
+      />
+    </div>
+  );
+}
+
+/* Reusable left-side content — accepts sizing props per breakpoint */
+function HeroContent({
+  headlineClass,
+  subClass,
+  badgeClass,
+  statClass,
+  ctaClass,
+}: {
+  headlineClass: string;
+  subClass?: string;
+  badgeClass?: string;
+  statClass: string;
+  ctaClass: string;
+}) {
+  return (
+    <>
+      {/* Escrow badge */}
+      <div
+        className={`inline-flex items-center gap-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm w-fit ${badgeClass ?? "mb-6"}`}
+      >
+        <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+        100% Aman dengan Escrow
+      </div>
+
+      {/* Headline */}
+      <h1
+        className={`font-black uppercase leading-[0.88] tracking-tight text-foreground ${headlineClass}`}
+        style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
+      >
+        Find Clothes
+        <br />
+        That Matches
+        <br />
+        Your Style
+      </h1>
+
+      {/* Subtext */}
+      <p
+        className={`mt-4 text-[13px] leading-relaxed text-muted-foreground ${subClass ?? "max-w-[360px]"}`}
+      >
+        Browse through our diverse range of meticulously crafted garments,
+        designed to bring out your individuality and cater to your sense of
+        style.
+      </p>
+
+      {/* CTA */}
+      <div className={`mt-6 flex gap-3 ${ctaClass}`}>
+        <Link
+          href="/products"
+          className="inline-flex items-center justify-center rounded-full bg-foreground px-7 py-3 text-sm font-semibold text-background hover:bg-foreground/85 transition-colors"
+        >
+          Shop Now
+        </Link>
+        <Link
+          href="/seller"
+          className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-7 py-3 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors"
+        >
+          Jual Sekarang
+        </Link>
+      </div>
+
+      {/* Stats */}
+      <div className={`mt-8 flex items-stretch divide-x divide-border ${statClass}`}>
+        {STATS.map((stat) => (
+          <div
+            key={stat.label}
+            className="pr-6 first:pl-0 [&:not(:first-child)]:pl-6"
+          >
+            <p
+              className="text-[1.5rem] font-black leading-none text-foreground"
+              style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
+            >
+              {stat.value}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {stat.label}
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-surface-container-low pt-16 pb-24 lg:pt-24 lg:pb-32">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-          <div className="flex flex-col justify-center space-y-6 text-center lg:text-left z-10">
-            <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary w-fit mx-auto lg:mx-0">
-              <ShieldCheck className="h-4 w-4 mr-2" />
+    <div className="w-full overflow-hidden">
+      {/* ═══════════════════════════════════════════════════════════
+          HERO
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="relative bg-[#F2F2F0] overflow-hidden">
+
+        {/* ── MOBILE < lg ──────────────────────────────────────── */}
+        <div className="lg:hidden flex flex-col">
+          <div className="px-6 pt-8 pb-0">
+            {/* Escrow badge */}
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm mb-5">
+              <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
               100% Aman dengan Escrow
             </div>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-              Gaya Lama, <span className="text-primary italic">Nilai Baru.</span>
+
+            <h1
+              className="text-[2.4rem] font-black uppercase leading-[0.88] tracking-tight text-foreground"
+              style={{ fontFamily: "'Integral CF Bold', 'Arial Black', sans-serif" }}
+            >
+              Find Clothes<br />That Matches<br />Your Style
             </h1>
-            
-            <p className="max-w-[600px] text-lg text-muted-foreground mx-auto lg:mx-0">
-              Platform jual beli pakaian preloved terpercaya di Indonesia. Temukan fashion berkualitas dengan harga terjangkau, transaksi 100% dilindungi sistem Escrow.
+
+            <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground max-w-sm">
+              Browse through our diverse range of meticulously crafted garments,
+              designed to bring out your individuality and cater to your sense of style.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-              <Link 
-                href="/products" 
-                className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3.5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-              >
-                <ShoppingBag className="mr-2 h-4 w-4" />
-                Mulai Belanja
+
+            <div className="mt-6 flex flex-col gap-2.5">
+              <Link href="/products" className="inline-flex items-center justify-center rounded-full bg-foreground px-8 py-3.5 text-sm font-semibold text-background hover:bg-foreground/85 transition-colors">
+                Shop Now
               </Link>
-              <Link 
-                href="/seller" 
-                className="inline-flex items-center justify-center rounded-md border border-input bg-background px-8 py-3.5 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-              >
+              <Link href="/seller" className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-8 py-3.5 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors">
                 Jual Sekarang
-                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
+            </div>
+
+            {/* Stats 2+1 */}
+            <div className="mt-8 flex items-stretch border-b border-border pb-5">
+              <div className="flex-1 flex flex-col">
+                <p className="text-2xl font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>200+</p>
+                <p className="text-[11px] text-muted-foreground mt-1">International Brands</p>
+              </div>
+              <div className="w-px bg-border self-stretch mx-4" />
+              <div className="flex-1 flex flex-col">
+                <p className="text-2xl font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>2,000+</p>
+                <p className="text-[11px] text-muted-foreground mt-1">High-Quality Products</p>
+              </div>
+            </div>
+            <div className="pt-5 mb-4">
+              <p className="text-2xl font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>30,000+</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Happy Customers</p>
             </div>
           </div>
-          
-          {/* Collage Images */}
-          <div className="relative mx-auto w-full max-w-[500px] lg:max-w-none h-[400px] lg:h-[500px]">
-            <div className="absolute right-0 top-0 w-2/3 h-4/5 rounded-2xl overflow-hidden shadow-2xl border-4 border-background z-20">
-              <Image 
-                src="https://picsum.photos/seed/hero1/600/800" 
-                alt="Vintage fashion rack"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
+
+          {/* Hero image */}
+          <div className="relative w-full" style={{ height: "360px" }}>
+            <Image src="/assets/images/hero-mobile.png" alt="Fashion model" fill priority className="object-cover object-top" sizes="100vw" />
+            <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#F2F2F0] to-transparent pointer-events-none" />
+          </div>
+        </div>
+
+        {/* ── TABLET  lg → xl  (1024px – 1279px) ─────────────── */}
+        <div className="hidden lg:flex xl:hidden flex-row items-stretch min-h-[560px]">
+
+          {/* Left content — fixed width so image always has room */}
+          <div className="flex flex-col justify-center px-10 pt-14 pb-10 w-[50%] shrink-0 z-10">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm mb-5 w-fit">
+              <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+              100% Aman dengan Escrow
             </div>
-            <div className="absolute left-0 bottom-0 w-3/5 h-3/5 rounded-2xl overflow-hidden shadow-xl border-4 border-background z-10 translate-y-8 lg:translate-x-8">
-              <Image 
-                src="https://picsum.photos/seed/hero2/600/800" 
-                alt="Denim streetwear"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 30vw"
-              />
+
+            <h1
+              className="text-[clamp(2.2rem,3.5vw,3.2rem)] font-black uppercase leading-[0.88] tracking-tight text-foreground"
+              style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
+            >
+              Find Clothes<br />That Matches<br />Your Style
+            </h1>
+
+            <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground max-w-[340px]">
+              Browse through our diverse range of meticulously crafted garments,
+              designed to bring out your individuality and cater to your sense of style.
+            </p>
+
+            <div className="mt-5 flex items-center gap-3 flex-wrap">
+              <Link href="/products" className="inline-flex items-center justify-center rounded-full bg-foreground px-7 py-3 text-sm font-semibold text-background hover:bg-foreground/85 transition-colors">
+                Shop Now
+              </Link>
+              <Link href="/seller" className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-7 py-3 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors">
+                Jual Sekarang
+              </Link>
             </div>
-            <div className="absolute bottom-1/4 right-1/4 translate-x-12 translate-y-12 w-24 h-24 rounded-full bg-verified-green/10 flex items-center justify-center z-30 backdrop-blur-md border border-verified-green/20">
-              <div className="text-center ">
-                <p className="font-bold text-white block leading-tight text-lg">10k+</p>
-                <p className="text-[10px] font-medium text-white">Terjual</p>
+
+            {/* Stats horizontal */}
+            <div className="mt-8 flex items-stretch divide-x divide-border">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="pr-5 first:pl-0 [&:not(:first-child)]:pl-5">
+                  <p className="text-[1.4rem] font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>
+                    {stat.value}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right image — fills remaining space */}
+          <div className="relative flex-1 min-w-0">
+            <Image
+              src="/assets/images/hero-mobile.png"
+              alt="Fashion model"
+              fill
+              priority
+              className="object-cover object-top"
+              sizes="50vw"
+            />
+            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#F2F2F0] to-transparent pointer-events-none" />
+            <StarIcon className="absolute top-8 right-8 w-9 h-9 text-foreground z-10" />
+            <StarIcon className="absolute top-[50%] left-[12%] w-5 h-5 text-foreground z-10" />
+          </div>
+        </div>
+
+        {/* ── DESKTOP  ≥ xl ────────────────────────────────────── */}
+        <div className="hidden xl:block">
+          <div className="max-w-screen-2xl mx-auto flex flex-row items-stretch min-h-[620px]">
+
+            {/* Left */}
+            <div className="flex flex-col justify-center px-16 2xl:px-24 pt-20 pb-12 w-[50%] shrink-0 z-10">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm mb-7 w-fit">
+                <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+                100% Aman dengan Escrow
               </div>
+
+              <h1
+                className="text-[clamp(3rem,4.2vw,5rem)] font-black uppercase leading-[0.88] tracking-tight text-foreground"
+                style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}
+              >
+                Find Clothes<br />That Matches<br />Your Style
+              </h1>
+
+              <p className="mt-5 max-w-[420px] text-[13px] leading-relaxed text-muted-foreground">
+                Browse through our diverse range of meticulously crafted garments,
+                designed to bring out your individuality and cater to your sense of style.
+              </p>
+
+              <div className="mt-8 flex items-center gap-4">
+                <Link href="/products" className="inline-flex items-center justify-center rounded-full bg-foreground px-9 py-3.5 text-sm font-semibold text-background hover:bg-foreground/85 transition-colors">
+                  Shop Now
+                </Link>
+                <Link href="/seller" className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-9 py-3.5 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors">
+                  Jual Sekarang
+                </Link>
+              </div>
+
+              <div className="mt-10 flex items-stretch divide-x divide-border">
+                {STATS.map((stat) => (
+                  <div key={stat.label} className="pr-8 first:pl-0 [&:not(:first-child)]:pl-8">
+                    <p className="text-[1.75rem] font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>
+                      {stat.value}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-1">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right image */}
+            <div className="relative flex-1 min-w-0 overflow-hidden">
+              <Image src="/assets/images/hero-mobile.png" alt="Fashion model" fill priority className="object-cover object-top" sizes="50vw" />
+              <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#F2F2F0] to-transparent pointer-events-none" />
+              <StarIcon className="absolute top-10 right-[8%] w-11 h-11 text-foreground z-10" />
+              <StarIcon className="absolute top-[52%] left-[8%] w-6 h-6 text-foreground z-10" />
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          BRAND TICKER
+      ═══════════════════════════════════════════════════════════ */}
+      <div className="bg-foreground text-background overflow-hidden py-8">
+
+        {/* Mobile: 3-col grid, last item centered if odd */}
+        <div className="lg:hidden grid grid-cols-3 justify-items-center items-center gap-y-6 px-4">
+          {BRANDS.map((brand, i) => {
+            const isLast = i === BRANDS.length - 1;
+            const isOddTotal = BRANDS.length % 2 !== 0;
+            const isCentered = isLast && isOddTotal;
+            return (
+              <div
+                key={i}
+                className={`flex items-center justify-center ${isCentered ? "col-span-3" : "col-span-1"}`}
+                style={{ width: 96, height: 40 }}
+              >
+                <img
+                  src={brand.image}
+                  alt={brand.name}
+                  style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", filter: "brightness(0) invert(1)" }}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Tablet: static row centered */}
+        <div className="hidden lg:flex xl:hidden items-center justify-center gap-10 px-10">
+          {BRANDS.map((brand, i) => (
+            <div key={i} className="flex items-center justify-center" style={{ width: 100, height: 40 }}>
+              <img
+                src={brand.image}
+                alt={brand.name}
+                style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", filter: "brightness(0) invert(1)" }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: marquee */}
+        <div className="hidden xl:block">
+          <div className="flex animate-marquee whitespace-nowrap items-center">
+            {[...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS].map((brand, i) => (
+              <div key={i} className="mx-10 flex items-center justify-center" style={{ width: 110, height: 44 }}>
+                <img
+                  src={brand.image}
+                  alt={brand.name}
+                  style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", filter: "brightness(0) invert(1)" }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

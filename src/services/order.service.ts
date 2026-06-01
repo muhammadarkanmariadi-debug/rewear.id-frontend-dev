@@ -34,7 +34,7 @@ export const orderService = {
 
   async confirmDelivery(id: string) {
     const res = await httpClient.post<ApiResponse<Order>>(
-      API_ENDPOINTS.ORDER_CONFIRM(id),
+      API_ENDPOINTS.ORDER_CONFIRM_RECEIVED(id),
     );
     return res.data.data;
   },

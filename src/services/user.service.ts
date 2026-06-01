@@ -19,7 +19,7 @@ export const userService = {
 
   async updateProfile(data: Partial<Pick<User, "name" | "bio" | "phone">>) {
     const res = await httpClient.put<ApiResponse<User>>(
-      API_ENDPOINTS.USERS,
+      API_ENDPOINTS.AUTH_PROFILE_UPDATE,
       data,
     );
     return res.data.data;
@@ -50,17 +50,17 @@ export const userService = {
   // ── Wishlist ─────────────────────────────────────────────
   async getWishlist() {
     const res = await httpClient.get<PaginatedResponse<{ product_id: string }>>(
-      API_ENDPOINTS.WISHLIST,
+      API_ENDPOINTS.BOOKMARKS,
     );
     return res.data;
   },
 
   async addToWishlist(productId: string) {
-    await httpClient.post(API_ENDPOINTS.WISHLIST, { product_id: productId });
+    await httpClient.post(API_ENDPOINTS.BOOKMARK_TOGGLE(productId));
   },
 
   async removeFromWishlist(productId: string) {
-    await httpClient.delete(`${API_ENDPOINTS.WISHLIST}/${productId}`);
+    await httpClient.delete(`${API_ENDPOINTS.BOOKMARKS}/${productId}`);
   },
 
   // ── Withdrawals ──────────────────────────────────────────

@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   AUTH_REGISTER: "/auth/register",
   AUTH_LOGOUT: "/auth/logout",
   AUTH_ME: "/auth/me",
+  AUTH_PROFILE_UPDATE: "/auth/me",
   AUTH_GOOGLE: "/auth/google",
 
   // Users
@@ -18,13 +19,18 @@ export const API_ENDPOINTS = {
 
   // Products
   PRODUCTS: "/products",
+  SELLER_PRODUCTS: "/seller/products",
   PRODUCT_DETAIL: (id: string) => `/products/${id}`,
+  SELLER_PRODUCT_DETAIL: (id: string) => `/seller/products/${id}`,
   PRODUCT_IMAGES: (id: string) => `/products/${id}/images`,
+  SELLER_PRODUCT_IMAGES: (id: string) => `/seller/products/${id}/images`,
 
   // Orders
   ORDERS: "/orders",
+  SELLER_ORDERS: "/seller/orders",
   ORDER_DETAIL: (id: string) => `/orders/${id}`,
-  ORDER_CONFIRM: (id: string) => `/orders/${id}/confirm`,
+  ORDER_CONFIRM_RECEIVED: (id: string) => `/orders/${id}/confirm-received`,
+  SELLER_ORDER_SHIP: (id: string) => `/orders/${id}/ship`,
 
   // Escrow
   ESCROW_STATUS: (orderId: string) => `/escrow/${orderId}`,
@@ -50,14 +56,15 @@ export const API_ENDPOINTS = {
   REVIEW_REPLY: (id: string) => `/reviews/${id}/reply`,
 
   // Wishlist
-  WISHLIST: "/wishlist",
+  BOOKMARKS: "/bookmarks",
+  BOOKMARK_TOGGLE: (id: string) => `/bookmarks/${id}/toggle`,
 
   // Withdrawals
   WITHDRAWALS: "/withdrawals",
 
   // Admin
   ADMIN_USERS: "/admin/users",
-  ADMIN_LISTINGS: "/admin/listings",
+  ADMIN_PRODUCTS: "/admin/products",
   ADMIN_DISPUTES: "/admin/disputes",
   ADMIN_REPORTS: "/admin/reports",
 } as const;
