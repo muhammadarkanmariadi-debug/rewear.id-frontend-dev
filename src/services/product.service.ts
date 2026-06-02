@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from "@/configs/api";
 
 export const productService = {
   async getAll(params?: Record<string, string | number>, credential?: string) {
-    return httpGet(API_ENDPOINTS.PRODUCTS, credential, undefined, params as any);
+    return httpGet(API_ENDPOINTS.PRODUCTS, "token", undefined, params as any);
   },
   async getCategories() {
     return httpGet(API_ENDPOINTS.CATEGORIES);
@@ -14,7 +14,7 @@ export const productService = {
     return httpGet(API_ENDPOINTS.SELLER_PRODUCTS, "token", undefined, params as any);
   },
   async getById(slug: string, credential?: string) {
-    return httpGet(API_ENDPOINTS.PRODUCT_DETAIL(slug), credential);
+    return httpGet(API_ENDPOINTS.PRODUCT_DETAIL(slug), "token");
   },
   async create(data: Record<string, unknown>) {
     const payload = await encryptClientPayload(JSON.stringify(data));
