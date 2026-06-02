@@ -21,6 +21,7 @@ export const userService = {
   },
   async toggleWishlist(productId: string) {
     const payload = await encryptClientPayload(JSON.stringify({}));
+    
     return httpPost(API_ENDPOINTS.BOOKMARK_TOGGLE(productId), payload, "token");
   },
   async removeFromWishlist(productId: string) {

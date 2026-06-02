@@ -33,7 +33,8 @@ function VerifyEmailLogic() {
       verifyEmail({
         uId,
         uHash,
-        params: { expires, signature }
+        expires,
+        signature
       }, {
         onSuccess: () => {
           setSuccess(true);

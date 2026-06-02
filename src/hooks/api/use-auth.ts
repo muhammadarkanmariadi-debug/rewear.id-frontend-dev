@@ -73,8 +73,8 @@ export const useResetPassword = () => {
 };
 export const useVerifyEmail = () => {
   return useMutation({
-    mutationFn: (data: { uId: string, uHash: string, params: Record<string, string> }) => 
-      authService.verifyEmail(data.uId, data.uHash, data.params),
+    mutationFn: (data: { uId: string, uHash: string, expires: string, signature: string }) => 
+      authService.verifyEmail(data.uId, data.uHash, data.expires, data.signature),
     onSuccess: (res) => {
       if (!res.status) throw new Error(res.message || "Error");
       toast.success("Email berhasil diverifikasi!");

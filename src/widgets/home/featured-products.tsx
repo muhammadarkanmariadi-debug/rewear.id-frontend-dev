@@ -5,12 +5,12 @@ import { productService } from "@/services";
 import { formatRupiah } from "@/shared/utils/format";
 import { ProductCard } from "../marketplace/product-card";
 import { Product } from "@/entities";
+import { cookies } from "next/headers";
 
 export async function FeaturedProducts() {
   let featured = [];
   try {
     const res = await productService.getAll({ per_page: "8" });
-    console.log(res);
 
     featured = res?.data || [];
   

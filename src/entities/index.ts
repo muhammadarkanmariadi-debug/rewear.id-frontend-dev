@@ -23,7 +23,6 @@ export type {
   ProductFilterParams,
   CreateProductRequest,
   Category,
-  Brand,
   ProductImage,
 } from "./product";
 

@@ -64,9 +64,7 @@ export const httpRequest = async <T = Record<string, never>>(
   const { credential, payload, query, meta } = options;
 
   try {
-
     const url = `${BASE_API_URL}${endpoint}${resolveQuery(query)}`;
-
     const headers = await resolveHeaders(credential, payload);
     const fetchMeta = buildFetchMeta(meta);
 

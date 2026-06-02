@@ -32,7 +32,7 @@ export const authService = {
     const payload = await encryptClientPayload(JSON.stringify(data));
     return httpPost(API_ENDPOINTS.AUTH_RESET_PASSWORD, payload);
   },
-  async verifyEmail(id: string, hash: string, query: Record<string, string>) {
-    return httpGet(API_ENDPOINTS.AUTH_VERIFY_EMAIL(id, hash), undefined, undefined, query);
+  async verifyEmail(id: string, hash: string, expires: string, signature: string) {
+    return httpGet(API_ENDPOINTS.AUTH_VERIFY_EMAIL(id, hash, expires, signature));
   },
 };
