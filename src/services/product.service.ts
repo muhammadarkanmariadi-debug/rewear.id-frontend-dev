@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from "@/configs/api";
 
 export const productService = {
   async getAll(params?: Record<string, string | number>) {
-    return httpGet(API_ENDPOINTS.PRODUCTS, undefined, undefined, params as any);
+    return httpGet(API_ENDPOINTS.PRODUCTS, "token", undefined, params as any);
   },
   async getSellerProducts(params?: Record<string, string | number>) {
     return httpGet(API_ENDPOINTS.SELLER_PRODUCTS, "token", undefined, params as any);

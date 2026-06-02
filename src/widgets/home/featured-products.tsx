@@ -9,6 +9,7 @@ export async function FeaturedProducts() {
   let featured = [];
   try {
     const res = await productService.getAll({ per_page: "8" });
+    console.log(res);
 
     featured = res?.data || [];
   
