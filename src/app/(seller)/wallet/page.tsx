@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { formatRupiah } from "@/shared/utils/format";
 import { ArrowDownToLine, Receipt, Wallet } from "lucide-react";
-import { bankAccountService, withdrawalService } from "@/services";
+import { authService, bankAccountService, withdrawalService } from "@/services";
 import { toast } from "sonner";
 
 interface BankAccountItem {
@@ -30,12 +30,19 @@ export default function WalletPage() {
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState<number>(0);
   const [selectedBankId, setSelectedBankId] = useState<string>("");
+  const [balance, setBalance] = useState<number>(0);
+
+  // State untuk form tambah rekening
+  const [showAddBank, setShowAddBank] = useState(false);
+  const [newBank, setNewBank] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
+  const [isSubmittingBank, setIsSubmittingBank] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [banksRes, withRes] = await Promise.all([
+      const [banksRes, withRes, userRes] = await Promise.all([
         bankAccountService.getAll(),
-        withdrawalService.getAll()
+        withdrawalService.getAll(),
+        authService.getMe()
       ]);
       if (banksRes.status && banksRes.data) {
         setBankAccounts(banksRes.data);
@@ -43,6 +50,9 @@ export default function WalletPage() {
       }
       if (withRes.status && withRes.data) {
         setWithdrawals(withRes.data);
+      }
+      if (userRes.status && userRes.data) {
+        setBalance(userRes.data.balance || 0);
       }
     } catch (err) {
       console.error(err);
@@ -55,21 +65,48 @@ export default function WalletPage() {
     fetchData();
   }, []);
 
+  const handleAddBank = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBank.bank_name || !newBank.account_number || !newBank.account_holder_name) {
+      return toast.warning("Semua kolom rekening wajib diisi");
+    }
+    setIsSubmittingBank(true);
+    try {
+      const res = await bankAccountService.create(newBank);
+      if (res.status) {
+        toast.success("Rekening berhasil ditambahkan!");
+        setNewBank({ bank_name: "", account_number: "", account_holder_name: "" });
+        setShowAddBank(false);
+        fetchData();
+      } else {
+        toast.error(res.message || "Gagal menambahkan rekening");
+      }
+    } catch (err) {
+      toast.error("Terjadi kesalahan saat menyimpan rekening");
+      console.error(err);
+    } finally {
+      setIsSubmittingBank(false);
+    }
+  };
+
   const handleWithdraw = async () => {
     if (!selectedBankId || amount < 50000) return toast.warning("Minimal penarikan Rp50.000");
+    if (amount > balance) return toast.warning("Saldo tidak mencukupi");
+
     try {
       const res = await withdrawalService.request({
         bank_account_id: selectedBankId,
         amount
       });
       if (res.status) {
-        toast("Permintaan penarikan berhasil dibuat!");
+        toast.success("Permintaan penarikan berhasil dibuat!");
+        setAmount(0);
         fetchData();
       } else {
-        toast(res.message || "Gagal melakukan penarikan dana");
+        toast.error(res.message || "Gagal melakukan penarikan dana");
       }
     } catch (err) {
-      toast("Gagal melakukan penarikan dana");
+      toast.error("Gagal melakukan penarikan dana");
       console.error(err);
     }
   };
@@ -93,23 +130,67 @@ export default function WalletPage() {
             <h3 className="text-sm font-semibold text-background/80 mb-2 flex items-center gap-2">
               <Wallet className="w-4 h-4" /> Saldo Tersedia
             </h3>
-            <p className="text-4xl font-bold font-mono tracking-tight">{formatRupiah(2450000)}</p>
+            <p className="text-4xl font-bold font-mono tracking-tight">{formatRupiah(balance)}</p>
           </div>
 
           <div className="relative z-10 mt-12 space-y-3">
-            <h4 className="text-xs font-semibold text-background/80 uppercase tracking-widest mb-1">Daftar Rekening</h4>
-            {bankAccounts.length === 0 ? (
-              <p className="text-sm">Belum ada bank yang tertaut.</p>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xs font-semibold text-background/80 uppercase tracking-widest">Daftar Rekening</h4>
+              <button
+                onClick={() => setShowAddBank(!showAddBank)}
+                className="text-xs bg-background/20 hover:bg-background/30 text-background px-3 py-1 rounded-full transition-colors"
+              >
+                {showAddBank ? "Batal" : "+ Tambah"}
+              </button>
+            </div>
+
+            {showAddBank ? (
+              <form onSubmit={handleAddBank} className="bg-background/10 rounded-xl p-4 border border-background/20 backdrop-blur-sm space-y-3">
+                <input
+                  type="text"
+                  placeholder="Nama Bank (Cth: BCA, Mandiri)"
+                  value={newBank.bank_name}
+                  onChange={e => setNewBank({ ...newBank, bank_name: e.target.value })}
+                  className="w-full bg-background/20 border-none rounded-lg px-3 py-2 text-sm text-background placeholder:text-background/50 outline-none focus:ring-2 focus:ring-background/30"
+                />
+                <input
+                  type="text"
+                  placeholder="Nomor Rekening"
+                  value={newBank.account_number}
+                  onChange={e => setNewBank({ ...newBank, account_number: e.target.value })}
+                  className="w-full bg-background/20 border-none rounded-lg px-3 py-2 text-sm text-background placeholder:text-background/50 outline-none focus:ring-2 focus:ring-background/30"
+                />
+                <input
+                  type="text"
+                  placeholder="Nama Pemilik Rekening"
+                  value={newBank.account_holder_name}
+                  onChange={e => setNewBank({ ...newBank, account_holder_name: e.target.value })}
+                  className="w-full bg-background/20 border-none rounded-lg px-3 py-2 text-sm text-background placeholder:text-background/50 outline-none focus:ring-2 focus:ring-background/30"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmittingBank}
+                  className="w-full bg-background text-foreground font-bold text-sm py-2 rounded-lg hover:bg-background/90 transition-colors disabled:opacity-50"
+                >
+                  {isSubmittingBank ? "Menyimpan..." : "Simpan Rekening"}
+                </button>
+              </form>
             ) : (
-              bankAccounts.map((b) => (
-                <div key={b.id} className="bg-background/10 rounded-xl p-4 border border-background/20 backdrop-blur-sm flex justify-between items-center">
-                  <p className="font-bold flex items-center gap-3">
-                    <span className="opacity-70">{b.bank_name}</span>
-                    <span>**** {b.account_number.slice(-4)}</span>
-                    <span className="opacity-70 ml-2 hidden sm:inline">{b.account_holder_name}</span>
-                  </p>
-                </div>
-              ))
+              <>
+                {bankAccounts.length === 0 ? (
+                  <p className="text-sm">Belum ada bank yang tertaut.</p>
+                ) : (
+                  bankAccounts.map((b) => (
+                    <div key={b.id} className="bg-background/10 rounded-xl p-4 border border-background/20 backdrop-blur-sm flex justify-between items-center">
+                      <p className="font-bold flex items-center gap-3">
+                        <span className="opacity-70">{b.bank_name}</span>
+                        <span>**** {b.account_number.slice(-4)}</span>
+                        <span className="opacity-70 ml-2 hidden sm:inline">{b.account_holder_name}</span>
+                      </p>
+                    </div>
+                  ))
+                )}
+              </>
             )}
           </div>
         </div>
@@ -176,7 +257,7 @@ export default function WalletPage() {
                   <td className="px-6 py-4">{w.bank_account?.bank_name} - {w.bank_account?.account_number}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 font-bold rounded-md text-xs ${w.status === 'completed' ? 'bg-green-500/10 text-green-500' :
-                        w.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-orange-500/10 text-orange-500'
+                      w.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-orange-500/10 text-orange-500'
                       }`}>
                       {w.status.toUpperCase()}
                     </span>

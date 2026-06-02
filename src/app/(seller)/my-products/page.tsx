@@ -43,7 +43,9 @@ export default function SellerProductsPage() {
           category: category,
           status: status
         });
+        console.log(res)
         if (res.data) {
+
           setProducts(res.data);
           if (res.meta?.last_page) setLastPage(res.meta.last_page);
         }

@@ -10,6 +10,7 @@ export interface User extends Timestamps {
   is_seller: boolean;
   is_seller_verified: boolean;
   is_admin: boolean;
+  balance?: number;
   rating_avg: number;
   rating_count: number;
 }
