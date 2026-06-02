@@ -1,4 +1,5 @@
 import { OrdersClient } from "@/widgets/orders/order-client";
+import { Suspense } from "react";
 
 
 export default function OrdersPage() {
@@ -10,7 +11,8 @@ export default function OrdersPage() {
           Lacak pembelian Anda dan kelola pesanan masuk dari pembeli.
         </p>
       </div>
-      <OrdersClient />
+      <Suspense fallback={<p>Memuat Data...</p>}>   <OrdersClient /></Suspense>
+
     </div>
   );
 }
