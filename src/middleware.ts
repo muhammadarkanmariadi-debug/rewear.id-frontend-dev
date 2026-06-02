@@ -9,9 +9,17 @@ export function middleware(request: NextRequest) {
   const isSeller = request.cookies.get("is_seller")?.value === "true";
   const isSellerVerified = request.cookies.get("is_seller_verified")?.value === "true";
 
+  const getLoginUrl = () => {
+    const loginUrl = new URL("/login", request.url);
+    if (pathname !== "/") {
+      loginUrl.searchParams.set("callbackUrl", pathname);
+    }
+    return loginUrl;
+  };
+
   // 1. Admin Routes
   if (pathname.startsWith("/admin")) {
-    if (!token) return NextResponse.redirect(new URL("/login", request.url));
+    if (!token) return NextResponse.redirect(getLoginUrl());
     if (!isAdmin) return NextResponse.redirect(new URL("/", request.url));
     return NextResponse.next();
   }
@@ -19,7 +27,7 @@ export function middleware(request: NextRequest) {
   // 2. Seller Routes (Dashboard, My Products, Wallet)
   const sellerRoutes = ["/dashboard", "/my-products", "/wallet"];
   if (sellerRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
-    if (!token) return NextResponse.redirect(new URL("/login", request.url));
+    if (!token) return NextResponse.redirect(getLoginUrl());
     if (isAdmin) return NextResponse.redirect(new URL("/admin", request.url));
     if (!isSeller) return NextResponse.redirect(new URL("/", request.url));
     if (!isSellerVerified) return NextResponse.redirect(new URL("/seller-verification", request.url));
@@ -29,7 +37,7 @@ export function middleware(request: NextRequest) {
   // 3. User Routes (Orders, Wishlist, Settings, Seller Verification)
   const userRoutes = ["/orders", "/wishlist", "/settings", "/seller-verification"];
   if (userRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
-    if (!token) return NextResponse.redirect(new URL("/login", request.url));
+    if (!token) return NextResponse.redirect(getLoginUrl());
     return NextResponse.next();
   }
 

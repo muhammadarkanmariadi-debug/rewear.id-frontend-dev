@@ -25,7 +25,17 @@ export default function LoginPage() {
       if (res.status) {
         useAuthStore.getState().setAuth(res.data.user, res.data.token);
         
-        // Arahkan sesuai peran pengguna persis setelah login
+        // Cek jika ada callbackUrl di query string
+        const search = window.location.search;
+        const urlParams = new URLSearchParams(search);
+        const callbackUrl = urlParams.get("callbackUrl");
+
+        if (callbackUrl && callbackUrl.startsWith("/")) {
+          router.push(callbackUrl);
+          return;
+        }
+
+        // Jika tidak ada callbackUrl, arahkan sesuai peran default
         if (res.data.user?.is_admin) {
           router.push("/admin");
         } else if (res.data.user?.is_seller && res.data.user?.is_seller_verified) {

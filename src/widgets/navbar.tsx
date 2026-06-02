@@ -9,6 +9,7 @@ import { ThemeSwitcher } from "./theme-switcher";
 import { useAuthStore } from "@/stores/auth.store";
 import { cn } from "@/shared/utils/cn"; // assuming cn utility exists
 import { authService } from "@/services";
+import Image from "next/image";
 
 
 export function Navbar() {
@@ -91,7 +92,7 @@ export function Navbar() {
             <div className="hidden md:flex items-center gap-2">
               <Link href="/settings" className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
                 {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt={user.name} className="w-7 h-7 rounded-full object-cover" />
+                  <Image src={user.avatar_url} alt={user.name} width={7} height={7} className="w-7 h-7 rounded-full object-cover" />
                 ) : (
                   <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs uppercase">
                     {user?.name?.charAt(0)}
@@ -99,7 +100,7 @@ export function Navbar() {
                 )}
                 <span className="text-sm font-medium pr-1">{user?.name}</span>
               </Link>
-              <button onClick={logout} title="Keluar" className="flex items-center justify-center hover:bg-red-500/10 w-9 h-9 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
+              <button onClick={async () => { await authService.logout(); logout(); }} title="Keluar" className="flex items-center justify-center hover:bg-red-500/10 w-9 h-9 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
