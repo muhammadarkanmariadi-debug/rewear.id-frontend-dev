@@ -4,8 +4,8 @@ import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
 
 export const productService = {
-  async getAll(params?: Record<string, string | number>) {
-    return httpGet(API_ENDPOINTS.PRODUCTS, "token", undefined, params as any);
+  async getAll(params?: Record<string, string | number>, credential?: string) {
+    return httpGet(API_ENDPOINTS.PRODUCTS, credential, undefined, params as any);
   },
   async getCategories() {
     return httpGet(API_ENDPOINTS.CATEGORIES);
@@ -13,8 +13,8 @@ export const productService = {
   async getSellerProducts(params?: Record<string, string | number>) {
     return httpGet(API_ENDPOINTS.SELLER_PRODUCTS, "token", undefined, params as any);
   },
-  async getById(slug: string) {
-    return httpGet(API_ENDPOINTS.PRODUCT_DETAIL(slug), "token");
+  async getById(slug: string, credential?: string) {
+    return httpGet(API_ENDPOINTS.PRODUCT_DETAIL(slug), credential);
   },
   async create(data: Record<string, unknown>) {
     const payload = await encryptClientPayload(JSON.stringify(data));
