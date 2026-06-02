@@ -34,6 +34,7 @@ export default function SellerVerificationPage() {
       const res = await userService.updateProfile(payload);
       if (res.status) {
         toast.success(res.message || "KTP berhasil diunggah.");
+        router.push("/settings");
         fetchData();
       } else {
         toast.error(res.message || "Gagal mengunggah KTP.");
@@ -72,7 +73,7 @@ export default function SellerVerificationPage() {
               </Link>
             </div>
           </div>
-        ) : user?.ktp_image_url ? (
+        ) : user?.is_seller ? (
           <div className="text-center py-12 space-y-4">
             <div className="w-20 h-20 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <Clock className="w-10 h-10" />

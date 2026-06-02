@@ -54,7 +54,7 @@ export default function SettingsPage() {
             ) : (
               <div className="mt-6 w-full">
                  <Link href="/seller-verification" className="flex items-center justify-center gap-2 bg-foreground text-background font-bold text-sm px-4 py-2.5 rounded-full w-full hover:bg-foreground/90 transition-colors">
-                   Verifikasi Akun Seller
+                   {user?.is_seller ? "Lihat Status Verifikasi" : "Verifikasi Akun Seller"}
                  </Link>
                  <p className="text-xs text-muted-foreground mt-3 text-center">Tingkatkan akun untuk mulai berjualan dan jangkau ribuan pembeli.</p>
               </div>
