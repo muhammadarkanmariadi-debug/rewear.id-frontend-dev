@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, UploadCloud } from "lucide-react";
 import Link from "next/link";
 import { productService } from "@/services";
+import { toast } from "sonner";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -50,12 +51,12 @@ export default function NewProductPage() {
          await productService.uploadImages(productId, fileData);
       }
 
-      alert("Produk berhasil ditambahkan!");
+      toast.success("Produk berhasil ditambahkan!");
       router.push("/my-products");
       router.refresh();
       
     } catch (err: any) {
-      alert(err.message || "Terjadi kesalahan");
+      toast.success(err.message || "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }

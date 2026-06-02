@@ -2,7 +2,7 @@ import { BASE_API_URL } from "@/global";
 
 export const API_BASE_URL = BASE_API_URL;
 
-export const BINDERBYTE_API_BASE_URL = process.env.NEXT_PUBLIC_BINDERBYTE_API_URL as string;
+
 
 export const API_ENDPOINTS = {
   // Auth

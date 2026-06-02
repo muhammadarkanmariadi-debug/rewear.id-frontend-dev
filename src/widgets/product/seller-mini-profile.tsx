@@ -22,7 +22,7 @@ export function SellerMiniProfile({ seller }: SellerMiniProfileProps) {
         <div>
           <div className="flex items-center gap-1.5">
             <h4 className="font-bold text-base leading-none max-w-[200px] truncate">{seller.name}</h4>
-            {seller.is_verified && (
+            {seller.is_seller_verified     && (
               <ShieldCheck className="w-4 h-4 text-green-500 shrink-0" />
             )}
           </div>

@@ -2,27 +2,23 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function ProductFilterSidebar() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface ProductFilterSidebarProps {
+  condition: string;
+  setCondition: (val: string) => void;
+  minPrice: string;
+  setMinPrice: (val: string) => void;
+  maxPrice: string;
+  setMaxPrice: (val: string) => void;
+}
 
-  const updateParam = (key: string, value: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    // Reset to page 1 on filter change if pagination applies
-    params.delete("page");
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
-
-  const currentCondition = searchParams.get("condition") || "";
-  const currentCategory = searchParams.get("category_id") || "";
-  const minPrice = searchParams.get("min_price") || "";
-  const maxPrice = searchParams.get("max_price") || "";
-
+export function ProductFilterSidebar({
+  condition,
+  setCondition,
+  minPrice,
+  setMinPrice,
+  maxPrice,
+  setMaxPrice,
+}: ProductFilterSidebarProps) {
   return (
     <aside className="w-full md:w-64 flex flex-col gap-8 shrink-0">
       
@@ -41,8 +37,8 @@ export function ProductFilterSidebar() {
                 type="radio" 
                 name="condition"
                 className="w-4 h-4 text-primary bg-background border-border accent-primary" 
-                checked={currentCondition === c.value}
-                onChange={() => updateParam("condition", c.value)}
+                checked={condition === c.value}
+                onChange={() => setCondition(c.value)}
               />
               <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors capitalize">
                 {c.label}
@@ -54,8 +50,8 @@ export function ProductFilterSidebar() {
               type="radio" 
               name="condition"
               className="w-4 h-4 text-primary bg-background border-border accent-primary" 
-              checked={currentCondition === ""}
-              onChange={() => updateParam("condition", null)}
+              checked={condition === ""}
+              onChange={() => setCondition("")}
             />
             <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
               Semua Kondisi
@@ -74,7 +70,7 @@ export function ProductFilterSidebar() {
             type="number" 
             placeholder="Min" 
             value={minPrice}
-            onChange={(e) => updateParam("min_price", e.target.value)}
+            onChange={(e) => setMinPrice(e.target.value)}
             className="w-full p-2 text-sm border border-border rounded-md bg-transparent" 
           />
           <span className="text-muted-foreground">-</span>
@@ -82,7 +78,7 @@ export function ProductFilterSidebar() {
             type="number" 
             placeholder="Max" 
             value={maxPrice}
-            onChange={(e) => updateParam("max_price", e.target.value)}
+            onChange={(e) => setMaxPrice(e.target.value)}
             className="w-full p-2 text-sm border border-border rounded-md bg-transparent" 
           />
         </div>

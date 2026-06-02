@@ -3,6 +3,7 @@ import { ArrowRight, Package, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 import { orderService, productService } from "@/services";
 
+
 export default async function DashboardPage() {
   let products = [];
   let orders = [];

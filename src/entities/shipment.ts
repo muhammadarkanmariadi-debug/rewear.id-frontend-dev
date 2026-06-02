@@ -1,6 +1,6 @@
 import type { Timestamps } from "./common";
 
-export type Courier = "jne" | "jnt" | "sicepat" | "anteraja";
+export type Courier = "jne" | "jnt" | "sicepat" | "anteraja" | "pos" | "tiki";
 
 export type ShipmentStatus =
   | "pending"
@@ -16,35 +16,33 @@ export interface Shipment extends Timestamps {
   tracking_number: string | null;
   status: ShipmentStatus;
   weight: number; // in grams
-  origin_city_id: string;
-  destination_city_id: string;
+  origin_city_id: number;
+  destination_city_id: number;
   shipping_cost: number;
   estimated_delivery: string | null;
   delivered_at: string | null;
 }
 
-// ── Binderbyte Region & Courier Types ──────────────────────
+// ──  Region & Courier Types ──────────────────────
 
-export interface BinderbyteProvince {
-  id: string;
+export interface Province {
+  id: number;
   name: string;
 }
 
-export interface BinderbyteCity {
-  id: string;
+export interface City {
+  id: number;
+  province_id: number;
   name: string;
 }
 
-export interface BinderbyteCourier {
-  code: string;
-  description: string;
-}
+
 
 // ── Backend-facing Types (used by shipment.service.ts) ─────
 
 export interface ShippingCostRequest {
-  origin: string;
-  destination: string;
+  origin: number;
+  destination: number;
   weight: number;
   courier: Courier;
 }

@@ -18,6 +18,10 @@ export function AddressSection({ initialData }: AddressSectionProps) {
       recipientLabel: "Rumah",
       phoneNumber: "08123456789",
       fullAddress: "Jl. Mawar Merah No. 12, Kebayoran Baru, Jakarta Selatan, 12160, DKI Jakarta",
+      provinceId: 1,
+      cityId: 1,
+      district: "Kebayoran Baru",
+      postalCode: "12160",
     }
   );
 

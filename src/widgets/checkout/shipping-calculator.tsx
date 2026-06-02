@@ -5,8 +5,7 @@ import { useState } from "react";
 import Select, { type SingleValue, type StylesConfig, components, type OptionProps, type SingleValueProps } from "react-select";
 import { Truck, MapPin } from "lucide-react";
 import Image from "next/image";
-import { binderbyteService } from "@/services/binderbyte.service";
-import type { BinderbyteProvince, BinderbyteCity } from "@/entities/shipment";
+
 
 // ── Hardcoded Courier Data ─────────────────────────────────
 
@@ -32,8 +31,8 @@ const COURIER_OPTIONS: CourierOption[] = [
 // ── Option Types ───────────────────────────────────────────
 
 import { useShippingRegions, type RegionOption } from "@/shared/hooks/use-shipping-regions";
+import { City, Province } from "@/entities/shipment";
 
-// ── Custom Courier Option Renderer ─────────────────────────
 
 function CourierOptionComponent(props: OptionProps<CourierOption>) {
   return (
@@ -61,7 +60,7 @@ function CourierSingleValue(props: SingleValueProps<CourierOption>) {
   );
 }
 
-// ── Shared Styles for React Select ─────────────────────────
+
 
 const selectStyles: StylesConfig<any, false> = {
   control: (base) => ({
@@ -126,25 +125,24 @@ const selectStyles: StylesConfig<any, false> = {
 // ── Props ──────────────────────────────────────────────────
 
 interface ShippingCalculatorProps {
-  initialProvinces: BinderbyteProvince[];
+  initialProvinces: Province[];
+  initialCities: City[];
 }
 
 // ── Component ──────────────────────────────────────────────
 
-export function ShippingCalculator({ initialProvinces }: ShippingCalculatorProps) {
+export function ShippingCalculator({ initialProvinces, initialCities }: ShippingCalculatorProps) {
   const {
     provinceOptions,
     cityOptions,
-    districtOptions,
+  
     selectedProvince,
     selectedCity,
-    selectedDistrict,
-    loadingCities,
-    loadingDistricts,
+    
     handleProvinceChange,
     handleCityChange,
-    setSelectedDistrict,
-  } = useShippingRegions(initialProvinces);
+
+  } = useShippingRegions(initialProvinces, initialCities);
 
   const [selectedCourier, setSelectedCourier] = useState<SingleValue<CourierOption>>(null);
 
@@ -178,27 +176,13 @@ export function ShippingCalculator({ initialProvinces }: ShippingCalculatorProps
               placeholder="-- Pilih Kota/Kabupaten --"
               isClearable
               isSearchable
-              isLoading={loadingCities}
+  
               isDisabled={!selectedProvince}
               styles={selectStyles}
               noOptionsMessage={() => "Pilih provinsi terlebih dahulu"}
             />
           </div>
-          <div>
-            <label className="block mb-1.5 font-semibold text-muted-foreground text-xs uppercase">Kecamatan</label>
-            <Select<RegionOption>
-              options={districtOptions}
-              value={selectedDistrict}
-              onChange={(option) => setSelectedDistrict(option)}
-              placeholder="-- Pilih Kecamatan --"
-              isClearable
-              isSearchable
-              isLoading={loadingDistricts}
-              isDisabled={!selectedCity}
-              styles={selectStyles}
-              noOptionsMessage={() => "Pilih kota terlebih dahulu"}
-            />
-          </div>
+        
         </div>
       </div>
 

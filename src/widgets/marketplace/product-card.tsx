@@ -16,14 +16,16 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(product.is_bookmarked ?? false);
   const [loading, setLoading] = useState(false);
 
+
   const handleBookmark = async (e: React.MouseEvent) => {
     e.preventDefault(); // prevent next/link redirect
     if (loading) return;
-    
+
     setLoading(true);
     const prev = isBookmarked;
     setIsBookmarked(!prev);
     
+
     try {
       const res = await bookmarkService.toggle(product.id);
       if (!res.status) setIsBookmarked(prev);
@@ -42,8 +44,8 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image Container */}
       <div className="relative bg-surface-container w-full aspect-[3/4] overflow-hidden">
         <Image
-          src={product.images[0]?.image_url || '/images/hero.png'}
-          alt={product.title}
+          src={product.images?.[0]?.image_url || '/images/hero.png'}
+          alt={product.title || 'image'}
           fill
           className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -81,13 +83,12 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleBookmark}
             disabled={loading}
-            className={`flex justify-center items-center mt-0.5 rounded-full w-7 h-7 transition-colors shrink-0 ${
-              isBookmarked
+            className={`flex justify-center items-center mt-0.5 rounded-full w-7 h-7 transition-colors shrink-0 ${isBookmarked
                 ? "bg-red-50 text-red-500 hover:bg-red-100"
                 : "text-muted-foreground/50 hover:bg-red-50/10 hover:text-red-400"
-            }`}
+              }`}
           >
-            <Heart className={`w-3.5 h-3.5 ${isBookmarked ? "fill-current" : ""}`} />
+            <Heart className={`w-3.5 h-3.5 ${isBookmarked || product.is_bookmarked === true ? "fill-current" : ""}`} />
           </button>
         </div>
 
@@ -104,20 +105,22 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Seller */}
-        <div className="flex items-center gap-2 pt-3 border-border/50 border-t">
-          <div className="relative border border-border/60 rounded-full w-4.5 h-4.5 overflow-hidden shrink-0">
-            <Image
-              src={product.seller.avatar_url || "https://i.pravatar.cc/150?img=11"}
-              alt={product.seller.name}
-              fill
-              sizes="18px"
-              className="object-cover"
-            />
+        {product.seller && (
+          <div className="flex items-center gap-2 pt-3 border-border/50 border-t">
+            <div className="relative border border-border/60 rounded-full w-4.5 h-4.5 overflow-hidden shrink-0">
+              <Image
+                src={product.seller.avatar_url || "https://i.pravatar.cc/150?img=11"}
+                alt={product.seller.name}
+                fill
+                sizes="18px"
+                className="object-cover"
+              />
+            </div>
+            <span className="text-[11px] text-muted-foreground/70 truncate">
+              {product.seller.name}
+            </span>
           </div>
-          <span className="text-[11px] text-muted-foreground/70 truncate">
-            {product.seller.name}
-          </span>
-        </div>
+        )}
       </div>
     </Link>
   );

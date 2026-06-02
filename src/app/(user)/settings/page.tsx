@@ -2,117 +2,20 @@
 
 import { Camera, CheckCircle2, MapPin, Plus, Trash2, Edit } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { authService, userService, addressService } from "@/services";
+import { useProfileSettings } from "@/shared/hooks/use-profile-settings";
+import { useAddressForm } from "@/shared/hooks/use-address-form";
 
 export default function SettingsPage() {
-  const [user, setUser] = useState<any>(null);
-  const [addresses, setAddresses] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Form states
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [savingSettings, setSavingSettings] = useState(false);
+  const {
+    user, name, setName, phone, setPhone,
+    savingSettings, handleSaveProfile,
+    addresses, loading, fetchData, handleDeleteAddress
+  } = useProfileSettings();
 
-  // Address modal states
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<any>(null);
-  const [addressForm, setAddressForm] = useState({
-    title: "",
-    recipient_name: "",
-    phone_number: "",
-    full_address: "",
-    province_id: 1, // Default dummy since we don't have province select yet
-    city_id: 1,
-    postal_code: "",
-    is_primary: false,
-  });
-
-  const fetchData = async () => {
-    try {
-      const [userRes, addressesRes] = await Promise.all([
-        authService.getMe(),
-        addressService.getAll()
-      ]);
-
-      if (userRes.status && userRes.data) {
-        setUser(userRes.data);
-        setName(userRes.data.name || "");
-        setPhone(userRes.data.phone || "");
-      }
-
-      if (addressesRes.status && addressesRes.data) {
-        setAddresses(addressesRes.data);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleSaveProfile = async () => {
-    setSavingSettings(true);
-    try {
-      const res = await userService.updateProfile({
-        name,
-        phone,
-      });
-      if (res.status) {
-        alert("Profil berhasil diperbarui");
-        fetchData();
-      } else {
-        alert(res.message || "Gagal memperbarui profil");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan pada server");
-    } finally {
-      setSavingSettings(false);
-    }
-  };
-
-  const handleSaveAddress = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      let res;
-      if (editingAddress) {
-        res = await addressService.update(editingAddress.id, addressForm);
-      } else {
-        res = await addressService.create(addressForm);
-      }
-
-      if (res.status) {
-        setShowAddressModal(false);
-        setEditingAddress(null);
-        fetchData();
-      } else {
-        alert(res.message || "Gagal menyimpan alamat");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan pada server");
-    }
-  };
-
-  const handleDeleteAddress = async (id: string) => {
-    if (!confirm("Hapus alamat ini?")) return;
-    try {
-      const res = await addressService.remove(id);
-      if (res.status) {
-        fetchData();
-      } else {
-        alert("Gagal menghapus alamat");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const {
+    showModal, form, provinces, availableCities, isSubmitting,
+    handleOpen, handleClose, handleChange, handleSubmit
+  } = useAddressForm(fetchData);
 
   if (loading) return <div className="p-8 text-center">Loading settings...</div>;
 
@@ -193,14 +96,7 @@ export default function SettingsPage() {
              <div className="p-6 border-b border-border flex justify-between items-center">
                 <h3 className="font-bold">Daftar Alamat</h3>
                 <button 
-                  onClick={() => {
-                    setEditingAddress(null);
-                    setAddressForm({
-                      title: "", recipient_name: "", phone_number: "", full_address: "",
-                      province_id: 1, city_id: 1, postal_code: "", is_primary: false
-                    });
-                    setShowAddressModal(true);
-                  }}
+                  onClick={() => handleOpen()}
                   className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:bg-primary/90 flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4"/> Tambah
@@ -214,16 +110,16 @@ export default function SettingsPage() {
                     <div key={a.id} className="border border-border rounded-xl p-4 flex justify-between items-start">
                        <div className="space-y-1">
                           <p className="font-bold flex items-center gap-2">
-                            {a.title} {a.is_primary && <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full inline-block">Utama</span>}
+                            {a.label} {a.is_default && <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full inline-block">Utama</span>}
                           </p>
-                          <p className="text-sm font-medium">{a.recipient_name} - {a.phone_number}</p>
+                          <p className="text-sm font-medium">{a.recipient_name} - {a.phone}</p>
                           <p className="text-sm text-muted-foreground">{a.full_address}</p>
-                          <p className="text-sm text-muted-foreground">{a.city?.name}, {a.province?.name} {a.postal_code}</p>
+                          <p className="text-sm text-muted-foreground">{a.district}, {a.city?.name || a.city_id}, {a.province?.name || a.province_id} {a.postal_code}</p>
                        </div>
                        <div className="flex items-center gap-2">
                           <button 
                             className="p-2 bg-muted rounded-md hover:bg-muted/80 text-foreground"
-                            onClick={() => alert("Hanya contoh, fitur Edit perlu modal lookup province/city")}
+                            onClick={() => handleOpen(a)}
                           >
                              <Edit className="w-4 h-4" />
                           </button>
@@ -243,57 +139,76 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {showAddressModal && (
+      {showModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-           <div className="bg-background rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative">
-              <div className="p-6 border-b border-border">
-                 <h3 className="font-bold text-lg">Tambah Alamat Baru</h3>
+           <div className="bg-background rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-border sticky top-0 bg-background z-10">
+                 <h3 className="font-bold text-lg">{form.label ? "Edit Alamat" : "Tambah Alamat Baru"}</h3>
               </div>
-              <form onSubmit={handleSaveAddress} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Label Alamat</label>
-                      <input required type="text" value={addressForm.title} onChange={e => setAddressForm({...addressForm, title: e.target.value})} placeholder="Rumah, Kantor..." className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                      <input required type="text" name="label" value={form.label} onChange={handleChange} placeholder="Rumah, Kantor..." className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Nama Penerima</label>
-                      <input required type="text" value={addressForm.recipient_name} onChange={e => setAddressForm({...addressForm, recipient_name: e.target.value})} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                      <input required type="text" name="recipient_name" value={form.recipient_name} onChange={handleChange} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
                     </div>
                  </div>
 
                  <div className="space-y-1.5">
                     <label className="text-sm font-medium">Nomor Handphone</label>
-                    <input required type="text" value={addressForm.phone_number} onChange={e => setAddressForm({...addressForm, phone_number: e.target.value})} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                    <input required type="text" name="phone" value={form.phone} onChange={handleChange} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
                  </div>
 
                  <div className="space-y-1.5">
                     <label className="text-sm font-medium">Alamat Lengkap</label>
-                    <textarea required rows={3} value={addressForm.full_address} onChange={e => setAddressForm({...addressForm, full_address: e.target.value})} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="Jalan, RT/RW, Patokan..." />
+                    <textarea required rows={3} name="full_address" value={form.full_address} onChange={handleChange} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="Jalan, RT/RW, Patokan..." />
                  </div>
                  
-                 <div className="grid grid-cols-3 gap-4">
+                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium">ID Provinsi</label>
-                      <input required type="number" value={addressForm.province_id} onChange={e => setAddressForm({...addressForm, province_id: Number(e.target.value)})} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                      <label className="text-sm font-medium">Provinsi</label>
+                      <select required name="province_id" value={form.province_id} onChange={handleChange} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary">
+                        <option value="0" disabled>-- Pilih Provinsi --</option>
+                        {provinces.map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium">ID Kota</label>
-                      <input required type="number" value={addressForm.city_id} onChange={e => setAddressForm({...addressForm, city_id: Number(e.target.value)})} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                      <label className="text-sm font-medium">Kota/Kabupaten</label>
+                      <select required name="city_id" value={form.city_id} onChange={handleChange} disabled={!form.province_id} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary disabled:opacity-50">
+                        <option value="0" disabled>-- Pilih Kota --</option>
+                        {availableCities.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium">Kecamatan</label>
+                      <input required type="text" name="district" value={form.district} onChange={handleChange} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Kode Pos</label>
-                      <input required type="text" value={addressForm.postal_code} onChange={e => setAddressForm({...addressForm, postal_code: e.target.value})} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                      <input required type="text" name="postal_code" value={form.postal_code} onChange={handleChange} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" />
                     </div>
                  </div>
 
                  <div className="flex items-center gap-2 pt-2">
-                    <input type="checkbox" id="is_primary" checked={addressForm.is_primary} onChange={e => setAddressForm({...addressForm, is_primary: e.target.checked})} className="rounded text-primary" />
-                    <label htmlFor="is_primary" className="text-sm font-medium">Jadikan Alamat Utama</label>
+                    <input type="checkbox" id="is_default" name="is_default" checked={form.is_default} onChange={handleChange} className="rounded text-primary w-4 h-4 cursor-pointer" />
+                    <label htmlFor="is_default" className="text-sm font-medium cursor-pointer">Jadikan Alamat Utama</label>
                  </div>
 
-                 <div className="flex justify-end gap-3 pt-4">
-                    <button type="button" onClick={() => setShowAddressModal(false)} className="px-4 py-2 rounded-lg font-bold bg-muted hover:bg-muted/80">Batal</button>
-                    <button type="submit" className="px-4 py-2 rounded-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90">Simpan Alamat</button>
+                 <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
+                    <button type="button" onClick={handleClose} disabled={isSubmitting} className="px-4 py-2 rounded-lg font-bold bg-muted hover:bg-muted/80">Batal</button>
+                    <button type="submit" disabled={isSubmitting || form.province_id === 0 || form.city_id === 0} className="px-4 py-2 rounded-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                      {isSubmitting ? "Menyimpan..." : "Simpan Alamat"}
+                    </button>
                  </div>
               </form>
            </div>

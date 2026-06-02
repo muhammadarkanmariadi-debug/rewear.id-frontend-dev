@@ -17,7 +17,7 @@ export default async function SellerProductsPage({ searchParams }: { searchParam
 
   const res = await productService.getSellerProducts(params);
   const products = res.data || [];
-  console.log(products)
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">

@@ -30,7 +30,7 @@ export function Navbar() {
   ];
 
   const navLinks = isMounted && isAuthenticated 
-    ? [...baseNavLinks, { label: "Dashboard", href: "/dashboard" }]
+    ? [...baseNavLinks, { label: "Pesanan Saya", href: "/orders" }]
     : baseNavLinks;
 
   return (
@@ -69,19 +69,7 @@ export function Navbar() {
           </nav>
         </div>
 
-        {/* M I D D L E (Search Bar - Desktop Only) */}
-        <div className="hidden lg:flex flex-1 mr-4 ml-auto max-w-sm">
-          <div className="group relative w-full">
-            <div className="left-0 absolute inset-y-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
-              <Search className="w-4 h-4" />
-            </div>
-            <input 
-              type="text" 
-              className="block bg-muted/50 focus:bg-background pr-4 pl-10 border focus:ring-border/20 border-transparent focus:border-border rounded-full outline-none focus:ring-4 w-full h-10 placeholder:text-muted-foreground text-sm transition-all"
-              placeholder="Cari tren, brand..." 
-            />
-          </div>
-        </div>
+    
 
         {/* R I G H T  S I D E (Actions) */}
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
@@ -97,7 +85,7 @@ export function Navbar() {
 
           {isMounted && isAuthenticated ? (
             <div className="hidden md:flex items-center gap-2">
-              <Link href="/dashboard" className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
+              <Link href="/settings" className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt={user.name} className="w-7 h-7 rounded-full object-cover" />
                 ) : (

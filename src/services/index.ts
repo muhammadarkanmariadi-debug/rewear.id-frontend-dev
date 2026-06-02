@@ -10,5 +10,5 @@ export { userService } from "./user.service";
 export { addressService } from "./address.service";
 export { bankAccountService } from "./bank-account.service";
 export { withdrawalService } from "./withdrawal.service";
-export { binderbyteService } from "./binderbyte.service";
+export { binderbyteService } from "./region.service";
 export { bookmarkService } from "./bookmark.service";

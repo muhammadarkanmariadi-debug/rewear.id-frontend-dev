@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { formatRupiah } from "@/shared/utils/format";
+import { formatRupiah, formatDate } from "@/shared/utils/format";
 import { ShieldCheck, MapPin, Package, ArrowLeft, Truck } from "lucide-react";
 import Link from "next/link";
 import { orderService, authService } from "@/services";
@@ -25,6 +25,9 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
     notFound(); 
   }
 
+  // Flattened address or rel
+  const addr = order.shipping_address || order.address;
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 md:px-0">
       
@@ -35,12 +38,12 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Status Pesanan: ORD-{order.id.slice(0, 8).toUpperCase()}</h1>
-          <p className="text-sm text-muted-foreground mt-1">Dibeli pada {new Date(order.created_at).toLocaleDateString()}</p>
+          <h1 className="text-2xl font-bold tracking-tight">Status Pesanan: ORD-{order.order_number || order.id.slice(0, 8).toUpperCase()}</h1>
+          <p className="text-sm text-muted-foreground mt-1">Dibeli pada {formatDate(order.created_at)}</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-foreground text-background font-bold text-sm rounded-full shrink-0 uppercase">
           <Truck className="w-4 h-4" />
-          {order.status}
+          {order.status.replace("_", " ")}
         </div>
       </div>
 
@@ -56,9 +59,8 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
               <h2 className="text-xl font-bold">Pelacakan Escrow & Resi</h2>
             </div>
             
-            {/* Simple Track info, you can use the EscrowTimeline if you connect it */}
             <div className="space-y-4">
-              <p className="text-sm">Status saat ini: <span className="font-bold">{order.status}</span></p>
+              <p className="text-sm">Status saat ini: <span className="font-bold">{order.status.replace("_", " ")}</span></p>
               {order.shipment?.tracking_number && (
                  <p className="text-sm text-muted-foreground">
                    Resi terdaftar: {order.shipment.tracking_number} ({order.shipment.courier?.toUpperCase()})
@@ -66,7 +68,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
               )}
             </div>
 
-            <OrderActions order={order} currentUser={currentUser} />
+            <OrderActions order={order} />
           </div>
         </div>
 
@@ -75,12 +77,16 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
           <div className="border border-border bg-card rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
             {order.product?.images?.[0] && (
                <div className="w-24 h-24 relative rounded-xl overflow-hidden mb-4 border border-border/50">
-                 <img src={order.product.images[0]} alt="Product" className="object-cover w-full h-full" />
+                 <img 
+                    src={typeof order.product.images[0] === 'string' ? order.product.images[0] : order.product.images[0].image_url} 
+                    alt="Product" 
+                    className="object-cover w-full h-full" 
+                  />
                </div>
             )}
             <h3 className="font-bold text-lg mb-1 leading-tight">{order.product?.title || "Produk"}</h3>
             <p className="text-sm font-semibold text-foreground bg-surface-container rounded-md px-2 py-1 mt-2">
-              Total Pembayaran: {formatRupiah(Number(order.total_price))}
+              Total Pembayaran: {formatRupiah(Number(order.total_amount || order.total_price))}
             </p>
           </div>
 
@@ -89,8 +95,9 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
               <MapPin className="w-4 h-4" /> Alamat Tujuan
             </h3>
             <div className="text-sm text-muted-foreground leading-relaxed">
-              <p className="font-semibold text-foreground mb-1">{order.address?.recipient_name} ({order.address?.phone_number})</p>
-              <p>{order.address?.full_address}</p>
+              <p className="font-semibold text-foreground mb-1">{addr?.recipient_name || order.buyer?.name} ({addr?.phone_number || addr?.phone || order.buyer?.phone})</p>
+              <p>{addr?.full_address || addr?.address}</p>
+              <p>{addr?.district}, {addr?.city?.name || addr?.city}</p>
             </div>
           </div>
           

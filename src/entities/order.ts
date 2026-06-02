@@ -24,13 +24,17 @@ export interface Order {
   total_amount: number;
   status: OrderStatus;
   notes: string | null;
+  payment?: import("./payment").Payment;
+  shipment?: import("./shipment").Shipment;
+  address?: import("./shipment").Shipment; // Sometimes returned as address in resource
   created_at: string;
 }
 
 export interface CreateOrderRequest {
   product_id: string;
   shipping_address_id: string;
-  courier: "jne" | "jnt" | "sicepat" | "anteraja";
+  courier: string;
   service: string;
+  shipping_cost: number;
   notes?: string;
 }
