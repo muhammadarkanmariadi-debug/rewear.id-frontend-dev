@@ -13,6 +13,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  console.log(product);
   const [isBookmarked, setIsBookmarked] = useState(product.is_bookmarked ?? false);
   const [loading, setLoading] = useState(false);
 
