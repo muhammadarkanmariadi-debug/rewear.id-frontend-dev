@@ -79,9 +79,11 @@ export function Navbar() {
             <Search className="w-4 h-4" />
           </Link>
 
-          <Link href="/wishlist" className="hidden sm:flex justify-center items-center hover:bg-muted rounded-full w-9 h-9 text-muted-foreground hover:text-foreground transition-colors" title="Wishlist">
-            <Heart className="w-4 h-4" />
-          </Link>
+          {isMounted && isAuthenticated && !isAdmin && (
+            <Link href="/wishlist" className="hidden sm:flex justify-center items-center hover:bg-muted rounded-full w-9 h-9 text-muted-foreground hover:text-foreground transition-colors" title="Wishlist">
+              <Heart className="w-4 h-4" />
+            </Link>
+          )}
 
           <div className="hidden sm:block mx-1 bg-border w-px h-6" />
 
@@ -162,15 +164,18 @@ export function Navbar() {
 
             <hr className="my-2 border-border/60" />
 
-            <Link onClick={() => setIsMobileMenuOpen(false)} href="/wishlist" className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
-              <Heart className="w-4 h-4" /> Wishlist
-            </Link>
-
             {isMounted && isAuthenticated && (
               <>
-                <Link onClick={() => setIsMobileMenuOpen(false)} href="/orders" className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
-                  <ShoppingBag className="w-4 h-4" /> Pesanan Saya
-                </Link>
+                {!isAdmin && (
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/wishlist" className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
+                    <Heart className="w-4 h-4" /> Wishlist
+                  </Link>
+                )}
+                {!isAdmin && (
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/orders" className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
+                    <ShoppingBag className="w-4 h-4" /> Pesanan Saya
+                  </Link>
+                )}
                 <Link onClick={() => setIsMobileMenuOpen(false)} href="/settings" className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
                   <User className="w-4 h-4" /> Pengaturan
                 </Link>
