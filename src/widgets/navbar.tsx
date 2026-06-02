@@ -92,7 +92,7 @@ export function Navbar() {
             <div className="hidden md:flex items-center gap-2">
               <Link href="/settings" className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
                 {user?.avatar_url ? (
-                  <Image src={user.avatar_url} alt={user.name} width={7} height={7} className="w-7 h-7 rounded-full object-cover" />
+                  <Image src={user.avatar_url} alt={user.name} width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                 ) : (
                   <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs uppercase">
                     {user?.name?.charAt(0)}

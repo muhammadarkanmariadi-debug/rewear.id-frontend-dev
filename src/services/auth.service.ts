@@ -1,7 +1,6 @@
 import { httpPost, httpGet, httpLogin } from "@/lib/http-client";
 import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
-import { clearAuthCookies } from "@/lib/cookies";
 
 export const authService = {
   async login(email: string, password: string) {
@@ -13,8 +12,12 @@ export const authService = {
     return httpPost(API_ENDPOINTS.AUTH_REGISTER, payload);
   },
   async logout() {
+    // 1. Beritahu backend Laravel untuk menghapus token
     const res = await httpPost(API_ENDPOINTS.AUTH_LOGOUT, "{}", "token");
-    await clearAuthCookies();
+    
+    // 2. Panggil API Route Next.js untuk memaksa penghapusan cookies di browser
+    await fetch("/api/auth/logout", { method: "POST" });
+    
     return res;
   },
   async getMe() {
