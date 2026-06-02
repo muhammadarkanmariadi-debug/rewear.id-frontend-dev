@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { BASE_API_URL } from "@/global";
@@ -104,7 +105,7 @@ export const httpRequest = async <T = Record<string, never>>(
 
 // ── Login khusus: simpan token ke cookie ──────────────────────
 
-export const httpLogin = async <T extends { token: string | null }>(
+export const httpLogin = async <T extends { token: string | null; user?: { is_admin?: boolean; is_seller?: boolean; is_seller_verified?: boolean } }>(
   endpoint: string,
   payload: string | FormData,
   credential?: string
@@ -117,7 +118,10 @@ export const httpLogin = async <T extends { token: string | null }>(
 
   if (result.status && result.data.token) {
     await setCookies("token", result.data.token);
-
+    
+    await setCookies("is_admin", result.data.user?.is_admin ? "true" : "false");
+    await setCookies("is_seller", result.data.user?.is_seller ? "true" : "false");
+    await setCookies("is_seller_verified", result.data.user?.is_seller_verified ? "true" : "false");
   }
 
   return result;

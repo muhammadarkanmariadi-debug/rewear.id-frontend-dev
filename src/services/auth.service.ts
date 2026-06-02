@@ -1,6 +1,7 @@
 import { httpPost, httpGet, httpLogin } from "@/lib/http-client";
 import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
+import { deleteCookies } from "@/lib/cookies";
 
 export const authService = {
   async login(email: string, password: string) {
@@ -12,7 +13,12 @@ export const authService = {
     return httpPost(API_ENDPOINTS.AUTH_REGISTER, payload);
   },
   async logout() {
-    return httpPost(API_ENDPOINTS.AUTH_LOGOUT, "{}", "token");
+    const res = await httpPost(API_ENDPOINTS.AUTH_LOGOUT, "{}", "token");
+    await deleteCookies("token");
+    await deleteCookies("is_admin");
+    await deleteCookies("is_seller");
+    await deleteCookies("is_seller_verified");
+    return res;
   },
   async getMe() {
     return httpGet(API_ENDPOINTS.AUTH_ME, "token");

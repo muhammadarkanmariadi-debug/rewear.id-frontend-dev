@@ -2,6 +2,7 @@
 
 import { Camera, CheckCircle2, MapPin, Plus, Trash2, Edit } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useProfileSettings } from "@/shared/hooks/use-profile-settings";
 import { useAddressForm } from "@/shared/hooks/use-address-form";
 
@@ -45,13 +46,22 @@ export default function SettingsPage() {
             <h2 className="font-bold text-lg">{user?.name || "User"}</h2>
             <p className="text-muted-foreground text-sm font-medium mt-1">{user?.email}</p>
             
-            {user?.role === "seller" && (
+            {user?.is_seller_verified ? (
               <div className="mt-6 flex items-center justify-center gap-2 bg-green-500/10 border border-green-500/20 text-green-600 font-bold text-sm px-4 py-2 rounded-full w-full">
                  <CheckCircle2 className="w-4 h-4" />
                  Seller Terverifikasi
               </div>
+            ) : (
+              <div className="mt-6 w-full">
+                 <Link href="/seller-verification" className="flex items-center justify-center gap-2 bg-foreground text-background font-bold text-sm px-4 py-2.5 rounded-full w-full hover:bg-foreground/90 transition-colors">
+                   Verifikasi Akun Seller
+                 </Link>
+                 <p className="text-xs text-muted-foreground mt-3 text-center">Tingkatkan akun untuk mulai berjualan dan jangkau ribuan pembeli.</p>
+              </div>
             )}
-            <p className="text-xs text-muted-foreground mt-3">Sistem Escrow kami melindungi setiap transaksi Anda.</p>
+            {user?.is_seller_verified && (
+               <p className="text-xs text-muted-foreground mt-3">Sistem Escrow kami melindungi setiap transaksi Anda.</p>
+            )}
           </div>
         </div>
 

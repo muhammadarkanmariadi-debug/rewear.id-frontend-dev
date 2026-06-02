@@ -25,6 +25,9 @@ export function OrdersClient() {
         const res = role === "seller"
           ? await orderService.getSellerOrders({ page: currentPage, per_page: perPage })
           : await orderService.getAll({ page: currentPage, per_page: perPage });
+
+
+          console.log(res)
         
         setOrders(res.data || []);
         // Assuming backend returns pagination meta in 'meta' or 'pagination'

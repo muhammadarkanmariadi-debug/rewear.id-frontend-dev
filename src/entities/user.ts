@@ -9,6 +9,7 @@ export interface User extends Timestamps {
   bio: string | null;
   is_seller: boolean;
   is_seller_verified: boolean;
+  is_admin: boolean;
   rating_avg: number;
   rating_count: number;
 }

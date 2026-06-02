@@ -1,4 +1,4 @@
-import { httpGet, httpPost } from "@/lib/http-client";
+import { httpGet, httpPost, httpPut } from "@/lib/http-client";
 import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
 
@@ -14,4 +14,11 @@ export const shipmentService = {
   async track(shipmentId: string) {
     return httpGet(API_ENDPOINTS.SHIPMENT_TRACK(shipmentId), "token");
   },
+  async updateTracking(shipmentId: string, trackingNumber: string, estimatedDeliveryAt?: string) {
+    const payload = await encryptClientPayload(JSON.stringify({ 
+       tracking_number: trackingNumber,
+       estimated_delivery_at: estimatedDeliveryAt
+    }));
+    return httpPut(API_ENDPOINTS.SHIPMENT_UPDATE_TRACKING(shipmentId), payload, "token");
+  }
 };

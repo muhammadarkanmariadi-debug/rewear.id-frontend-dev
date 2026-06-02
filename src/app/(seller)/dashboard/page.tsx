@@ -1,29 +1,34 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatRupiah } from "@/shared/utils/format";
 import { ArrowRight, Package, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
-import { orderService, productService } from "@/services";
+import Image from "next/image";
+import { orderService, productService, authService } from "@/services";
 
 
 export default async function DashboardPage() {
   let products = [];
   let orders = [];
+  let user = null;
 
   try {
-     const [prodRes, orderRes] = await Promise.all([
+     const [prodRes, orderRes, meRes] = await Promise.all([
         productService.getSellerProducts(),
-        orderService.getSellerOrders()
+        orderService.getSellerOrders(),
+        authService.getMe()
      ]);
      products = prodRes?.data?.slice(0, 3) || [];
      orders = orderRes?.data?.slice(0, 4) || [];
-  } catch (err) {
-     console.error("Failed to load dashboard metrics");
+     user = meRes?.data || null;
+  } catch (error) {
+     console.error("Failed to load dashboard metrics", error);
   }
 
   // Dashboard sum metrics can be calculated directly or obtained via balance api if it exists.
   // We will run basic calculation on orders as placeholder logic for dashboard.
   const stats = [
     { label: "Total Penjualanku", value: orders.length || 0, icon: Package, amount: null },
-    { label: "Saldo Tersedia", value: null, icon: Wallet, amount: products.length > 0 ? 0 : 0 },
+    { label: "Saldo Tersedia", value: null, icon: Wallet, amount: user?.balance || 0 },
     { label: "Dana Tertahan (Escrow)", value: null, icon: TrendingUp, amount: 0 },
   ];
 
@@ -105,8 +110,8 @@ export default async function DashboardPage() {
                <p className="text-sm text-muted-foreground py-4 text-center">Belum ada produk.</p>
             ) : products.map((product: any) => (
               <div key={product.id} className="flex gap-4 items-center">
-                <div className="w-16 h-16 rounded-xl bg-surface-container overflow-hidden shrink-0 border border-border/50">
-                  <img src={product.images?.[0] || ""} alt={product.title} className="w-full h-full object-cover" />
+                <div className="w-16 h-16 rounded-xl bg-surface-container overflow-hidden shrink-0 border border-border/50 relative">
+                  <Image src={product.images?.[0]?.image_url || "/placeholder.jpg"} alt={product.title} fill className="object-cover" sizes="(max-width: 64px) 100vw, 64px" />
                 </div>
                 <div className="min-w-0">
                   <h4 className="font-semibold text-sm truncate">{product.title}</h4>

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware"; // 1. Import persist
 import type { User } from "@/entities";
+import { authService } from "@/services";
 
 interface AuthState {
   user: User | null;
@@ -31,7 +32,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
 
       logout: () => {
-      
+       
         set({ user: null, token: null, isAuthenticated: false, isLoading: false });
       },
 
@@ -40,9 +41,9 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "auth-storage", // Nama kunci di localStorage
       storage: createJSONStorage(() => localStorage), // Menggunakan localStorage
-      
+
       // Opsional: Jika kamu menggunakan Next.js (SSR), gunakan ini agar tidak error hydration
-      skipHydration: true, 
+      skipHydration: true,
     }
   )
 );

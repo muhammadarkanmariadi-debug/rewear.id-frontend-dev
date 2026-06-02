@@ -24,7 +24,15 @@ export default function LoginPage() {
     
       if (res.status) {
         useAuthStore.getState().setAuth(res.data.user, res.data.token);
-        router.push("/dashboard");
+        
+        // Arahkan sesuai peran pengguna persis setelah login
+        if (res.data.user?.is_admin) {
+          router.push("/admin");
+        } else if (res.data.user?.is_seller && res.data.user?.is_seller_verified) {
+          router.push("/dashboard");
+        } else {
+          router.push("/");
+        }
 
       } else {
         setError(res.message || "Gagal masuk. Periksa kembali detail Anda.");

@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from "next/navigation";
 import { productService } from "@/services";
 import { ProductGallery } from "@/widgets/product/product-gallery";
 import { SellerMiniProfile } from "@/widgets/product/seller-mini-profile";
-import { ShippingEstimator } from "@/widgets/product/shipping-estimator";
 import { formatRupiah } from "@/shared/utils/format";
 import { ShieldCheck, Share2, Info, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -86,7 +86,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               </div>
               <div>
                 <p className="mb-1 text-muted-foreground">Merek</p>
-                <p className="font-semibold uppercase">{product.brand?.name || "Unbranded"}</p>
+                <p className="font-semibold uppercase">{product.brand || "Unbranded"}</p>
               </div>
               <div>
                 <p className="mb-1 text-muted-foreground">Ukuran</p>

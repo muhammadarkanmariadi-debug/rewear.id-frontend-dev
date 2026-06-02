@@ -1,5 +1,7 @@
+/* eslint-disable react-hooks/immutability */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { orderService, shipmentService, paymentService } from "@/services";
@@ -101,10 +103,10 @@ export function OrderActions({ order }: { order: any }) {
           },
         });
       } else {
-        alert("Midtrans Snap tidak termuat.");
+        toast("Midtrans Snap tidak termuat.");
       }
     } catch (e: any) {
-      alert("Terjadi kesalahan: " + e.message);
+      toast("Terjadi kesalahan: " + e.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -119,10 +121,10 @@ export function OrderActions({ order }: { order: any }) {
       if (res.status) {
          router.refresh();
       } else {
-         alert("Gagal mengonfirmasi");
+         toast("Gagal mengonfirmasi");
       }
     } catch (e: any) {
-      alert("Error: " + e.message);
+      toast("Error: " + e.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,7 +132,7 @@ export function OrderActions({ order }: { order: any }) {
 
   const handleAddTracking = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trackingNumber) return alert("Masukkan resi");
+    if (!trackingNumber) return toast("Masukkan resi");
 
     setIsSubmitting(true);
     try {
@@ -138,10 +140,10 @@ export function OrderActions({ order }: { order: any }) {
       if (res.status) {
          router.refresh();
       } else {
-         alert("Gagal menambah resi");
+         toast("Gagal menambah resi");
       }
     } catch (e: any) {
-      alert("Error: " + e.message);
+      toast("Error: " + e.message);
     } finally {
       setIsSubmitting(false);
     }
