@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
   AUTH_PROFILE_UPDATE: "/auth/me",
   AUTH_FORGOT_PASSWORD: "/auth/forgot-password",
   AUTH_RESET_PASSWORD: "/auth/reset-password",
-  AUTH_VERIFY_EMAIL: (id: string, hash: string) => `/auth/email/verify/${id}/${hash}`,
+  AUTH_VERIFY_EMAIL: (id: string, hash: string, expires: string, signature: string) => `/auth/email/verify/${id}/${hash}&signature=${signature}`,
   AUTH_GOOGLE: "/auth/google", // Not in swagger but keeps existing structure
 
   // Discovery (Provinces, Cities, Brands, Categories)
