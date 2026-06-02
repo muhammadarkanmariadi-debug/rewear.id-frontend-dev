@@ -3,27 +3,32 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/shared/utils/cn";
-import { LayoutDashboard, Package, ShoppingBag, Heart, Wallet, Settings, HdIcon } from "lucide-react";
-import { useAuthStore } from "@/stores";
+import { LayoutDashboard, Package, ShoppingBag, Heart, Wallet, Settings, HdIcon, ArrowLeft } from "lucide-react";
+
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuthStore()
+
 
   const menuItems = [
     { label: "Ringkasan", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Pesanan Masuk", href: "/orders", icon: Package },
-    user?.is_seller_verified && { label: "Katalog Produk", href: "/my-products", icon: ShoppingBag },
-    { label: "Wishlist Saya", href: "/wishlist", icon: Heart },
-    user?.is_seller_verified && { label: "Saldo Escrow", href: "/wallet", icon: Wallet },
-    { label: "Pengaturan Akun", href: "/settings", icon: Settings },
+
+{ label: "Katalog Produk", href: "/my-products", icon: ShoppingBag },
+
+  { label: "Saldo Escrow", href: "/wallet", icon: Wallet },
+ 
   ].filter(Boolean) as { label: string; href: string; icon: React.ElementType }[];
 
   return (
     <aside className="w-64 border-r border-border/50 h-[calc(100vh-4rem)] bg-card sticky top-16">
       <div className="flex flex-col h-full py-6 px-4">
 
+        
         <div className="mb-6 px-4">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Kembali ke Beranda
+          </Link>
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">User Menu</h2>
         </div>
 

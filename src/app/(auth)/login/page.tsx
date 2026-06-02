@@ -21,10 +21,28 @@ export default function LoginPage() {
 
     try {
       const res = await authService.login(email, password);
-    
+
       if (res.status) {
         useAuthStore.getState().setAuth(res.data.user, res.data.token);
-        router.push("/dashboard");
+
+        // Cek jika ada callbackUrl di query string
+        const search = window.location.search;
+        const urlParams = new URLSearchParams(search);
+        const callbackUrl = urlParams.get("callbackUrl");
+
+        if (callbackUrl && callbackUrl.startsWith("/")) {
+          router.push(callbackUrl);
+          return;
+        }
+
+        // Jika tidak ada callbackUrl, arahkan sesuai peran default
+        if (res.data.user?.is_admin) {
+          router.push("/admin");
+        } else if (res.data.user?.is_seller && res.data.user?.is_seller_verified) {
+          router.push("/dashboard");
+        } else {
+          router.push("/");
+        }
 
       } else {
         setError(res.message || "Gagal masuk. Periksa kembali detail Anda.");
@@ -51,7 +69,7 @@ export default function LoginPage() {
             {error}
           </div>
         )}
-        
+
         {/* Email Input */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium" htmlFor="email">Email</label>
@@ -59,14 +77,14 @@ export default function LoginPage() {
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
               <Mail className="h-4 w-4" />
             </div>
-            <input 
-              id="email" 
-              type="email" 
+            <input
+              id="email"
+              type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50" 
-              placeholder="nama@email.com" 
+              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="nama@email.com"
               disabled={loading}
             />
           </div>
@@ -84,20 +102,20 @@ export default function LoginPage() {
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
               <Lock className="h-4 w-4" />
             </div>
-            <input 
-              id="password" 
-              type="password" 
+            <input
+              id="password"
+              type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50" 
-              placeholder="••••••••" 
+              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="••••••••"
               disabled={loading}
             />
           </div>
         </div>
 
-        <button 
+        <button
           type="submit"
           disabled={loading}
           className="inline-flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
@@ -118,7 +136,7 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-6">
-        <button 
+        <button
           type="button"
           disabled={loading}
           className="inline-flex w-full items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50"

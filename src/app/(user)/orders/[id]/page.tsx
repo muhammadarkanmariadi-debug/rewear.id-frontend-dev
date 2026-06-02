@@ -19,13 +19,13 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
   ]);
 
   const order = orderRes.data;
-  const currentUser = currentUserRes.data;
+ 
 
   if (!order) {
     notFound(); 
   }
 
-  // Flattened address or rel
+
   const addr = order.shipping_address || order.address;
 
   return (

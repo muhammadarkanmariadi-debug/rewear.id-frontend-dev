@@ -19,7 +19,6 @@ export const API_ENDPOINTS = {
   // Discovery (Provinces, Cities, Brands, Categories)
   PROVINCES: "/provinces",
   CITIES: "/cities",
-  BRANDS: "/brands",
   CATEGORIES: "/categories",
   SEARCH: "/search",
 
@@ -58,6 +57,7 @@ export const API_ENDPOINTS = {
   // Shipments
   SHIPPING_COST: "/shipping/cost",
   SHIPMENT_TRACK: (id: string) => `/shipments/${id}/track`,
+  SHIPMENT_UPDATE_TRACKING: (id: string) => `/shipments/${id}/tracking`,
 
   // Escrow Confirm
   ESCROW_CONFIRM_RECEIPT: (orderId: string) => `/orders/${orderId}/confirm-received`,
@@ -80,7 +80,23 @@ export const API_ENDPOINTS = {
 
   // Admin
   ADMIN_USERS: "/admin/users",
+  ADMIN_USER_BAN: (id: string) => `/admin/users/${id}/ban`,
+  ADMIN_USER_UNBAN: (id: string) => `/admin/users/${id}/unban`,
+  
   ADMIN_PRODUCTS: "/admin/products",
+  ADMIN_PRODUCT_DELETE: (id: string) => `/admin/products/${id}`,
+  
   ADMIN_DISPUTES: "/admin/disputes",
-  ADMIN_REPORTS: "/admin/reports",
+  ADMIN_DISPUTE_DETAIL: (id: string) => `/admin/disputes/${id}`,
+  ADMIN_DISPUTE_RESOLVE: (id: string) => `/admin/disputes/${id}/resolve`,
+  
+  ADMIN_WITHDRAWALS: "/admin/withdrawals",
+  ADMIN_WITHDRAWAL_APPROVE: (id: string) => `/admin/withdrawals/${id}/approve`,
+  ADMIN_WITHDRAWAL_REJECT: (id: string) => `/admin/withdrawals/${id}/reject`,
+  
+  ADMIN_SELLER_VERIFICATIONS: "/admin/seller-verifications",
+  ADMIN_SELLER_VERIFY: (id: string) => `/admin/seller-verifications/${id}/verify`,
+  
+  ADMIN_REPORTS_TRANSACTIONS: "/admin/reports/transactions",
+  ADMIN_REPORTS_OVERVIEW: "/admin/reports/overview",
 } as const;

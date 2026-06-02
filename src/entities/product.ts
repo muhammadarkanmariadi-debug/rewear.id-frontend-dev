@@ -12,12 +12,6 @@ export interface Category {
   children?: Category[];
 }
 
-export interface Brand {
-  id: string;
-  name: string;
-  slug: string;
-  logo_url: string | null;
-}
 
 export interface ProductImage {
   id: string;
@@ -39,7 +33,7 @@ export interface Product {
   views_count: number;
   seller: User;
   category: Category;
-  brand?: Brand;
+  brand?: string | null;
   images: ProductImage[] ;
   created_at: string;
   is_bookmarked?: boolean;
@@ -47,7 +41,7 @@ export interface Product {
 
 export interface ProductFilterParams {
   category_id?: string;
-  brand_id?: string;
+  brand?: string;
   condition?: ProductCondition;
   min_price?: number;
   max_price?: number;
@@ -56,7 +50,7 @@ export interface ProductFilterParams {
 
 export interface CreateProductRequest {
   category_id: string;
-  brand_id?: string;
+  brand?: string;
   title: string;
   description: string;
   size: string;

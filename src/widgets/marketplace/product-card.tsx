@@ -75,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1 min-w-0">
             <p className="mb-0.5 font-semibold text-[10px] text-muted-foreground/70 uppercase tracking-[0.15em]">
-              {product.brand?.name || "Unbranded"}
+              {product.brand || "Unbranded"}
             </p>
             <h3 className="font-medium text-foreground text-sm line-clamp-2 leading-snug">
               {product.title}

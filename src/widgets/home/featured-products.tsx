@@ -4,6 +4,7 @@ import { ShieldCheck, Heart } from "lucide-react";
 import { productService } from "@/services";
 import { formatRupiah } from "@/shared/utils/format";
 import { ProductCard } from "../marketplace/product-card";
+import { Product } from "@/entities";
 
 export async function FeaturedProducts() {
   let featured = [];
@@ -31,7 +32,7 @@ export async function FeaturedProducts() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {featured.map((product: any) => (
+          {featured.map((product: Product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

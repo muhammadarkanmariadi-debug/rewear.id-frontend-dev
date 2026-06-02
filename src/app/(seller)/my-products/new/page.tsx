@@ -1,54 +1,63 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, UploadCloud } from "lucide-react";
+import { ArrowLeft, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { productService } from "@/services";
 import { toast } from "sonner";
+import { CldUploadWidget } from "next-cloudinary";
 
 export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
-    category_id: 1, // Fallback dummy
+    category_id: "",
     condition: "",
     brand: "",
     size: "",
     description: "",
     price: "",
-    weight: 1000, // Dummy weight for shipping cost
+    weight: 1000, 
     stock: 1
   });
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
-  // Basic image mock for UI purposes (actual file upload requires handling File objects and FormData)
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  useEffect(() => {
+    productService.getCategories().then((res) => {
+      if (res.data) setCategories(res.data);
+    });
+  }, []);
+
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      // 1. Create product
-      const res = await productService.create({
-        ...formData,
+      if (imageUrls.length === 0) throw new Error("Silakan unggah foto produk terlebih dahulu.");
+
+      const payload: Record<string, any> = {
+        title: formData.title,
+        brand: formData.brand || null,
+        category_id: formData.category_id,
+        condition: formData.condition,
+        size: formData.size,
+        description: formData.description,
         price: Number(formData.price),
-        weight: Number(formData.weight),
-        stock: Number(formData.stock)
-      });
+        weight_grams: Number(formData.weight),
+        stock: Number(formData.stock),
+        images: imageUrls
+      };
+
+      const res = await productService.create(payload);
       
-      const productId = res?.data?.id;
-
-      if (!res.status || !productId) {
+      if (!res.status) {
          throw new Error(res.message || "Gagal membuat produk");
-      }
-
-      // 2. Upload Image if exists
-      if (imageFile) {
-         const fileData = new FormData();
-         fileData.append("images[]", imageFile);
-         await productService.uploadImages(productId, fileData);
       }
 
       toast.success("Produk berhasil ditambahkan!");
@@ -56,7 +65,7 @@ export default function NewProductPage() {
       router.refresh();
       
     } catch (err: any) {
-      toast.success(err.message || "Terjadi kesalahan");
+      toast.error(err.message || "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }
@@ -76,20 +85,47 @@ export default function NewProductPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Foto Produk */}
         <div className="md:col-span-1 space-y-4">
-          <label className="bg-surface-container border-2 border-dashed border-border/60 hover:border-foreground/50 rounded-2xl aspect-square flex flex-col items-center justify-center transition-colors cursor-pointer text-muted-foreground hover:text-foreground group overflow-hidden relative">
-            {imageFile ? (
-               <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
-            ) : (
-              <>
-                <UploadCloud className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
-                <p className="font-semibold text-sm">Unggah Foto Utama</p>
-                <p className="text-xs text-center mt-1 px-4">Format: JPG, PNG. Maks 5MB.</p>
-              </>
-            )}
-            <input type="file" accept="image/*" className="hidden" onChange={(e) => { 
-                if (e.target.files && e.target.files[0]) setImageFile(e.target.files[0]); 
-            }} />
-          </label>
+          <CldUploadWidget 
+             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "rewear_unsigned"}
+             onSuccess={(result: any) => {
+                if (result.info?.secure_url) {
+                  setImageUrls(prev => {
+                     if (prev.length >= 5) {
+                        toast.warning("Maksimal 5 foto produk.");
+                        return prev;
+                     }
+                     return [...prev, result.info.secure_url];
+                  });
+                }
+             }}
+             options={{ maxFiles: 5, multiple: true }}
+          >
+             {({ open }) => (
+                <div 
+                   onClick={() => {
+                      if (imageUrls.length < 5) open();
+                   }}
+                   className={`bg-surface-container border-2 border-dashed border-border/60 rounded-2xl aspect-square flex flex-col items-center justify-center transition-colors text-muted-foreground relative overflow-hidden ${imageUrls.length >= 5 ? 'cursor-not-allowed opacity-50' : 'hover:border-foreground/50 hover:text-foreground cursor-pointer group'}`}
+                >
+                   <UploadCloud className={`w-10 h-10 mb-3 ${imageUrls.length < 5 ? 'group-hover:scale-110' : ''} transition-transform`} />
+                   <p className="font-semibold text-sm">Unggah Foto Produk</p>
+                   <p className="text-xs text-center mt-1 px-4">Maks 5 Foto. Format: JPG, PNG.</p>
+                </div>
+             )}
+          </CldUploadWidget>
+          
+          {imageUrls.length > 0 && (
+             <div className="grid grid-cols-3 gap-2">
+                {imageUrls.map((url, i) => (
+                   <div key={i} className="relative aspect-square border border-border rounded-lg overflow-hidden">
+                      <Image src={url} alt={`Preview ${i}`} fill className="object-cover" sizes="(max-width: 150px) 100vw, 150px" />
+                      <button type="button" onClick={() => setImageUrls(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/50 hover:bg-red-500 text-white rounded-full p-1 transition-colors">
+                         <X className="w-3 h-3" />
+                      </button>
+                   </div>
+                ))}
+             </div>
+          )}
         </div>
 
         {/* Form Details */}
@@ -106,10 +142,12 @@ export default function NewProductPage() {
               <div>
                 <label className="block text-sm font-bold mb-1.5">Kategori</label>
                 <select required 
-                        value={formData.category_id} onChange={e => setFormData({...formData, category_id: Number(e.target.value)})}
+                        value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})}
                         className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-foreground/20">
-                  <option value={1}>Top (Kemeja, Kaos, Jaket)</option>
-                  <option value={2}>Bottom (Celana, Rok)</option>
+                  <option value="">Pilih Kategori</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -118,9 +156,10 @@ export default function NewProductPage() {
                         value={formData.condition} onChange={e => setFormData({...formData, condition: e.target.value})}
                         className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-foreground/20">
                   <option value="">Pilih Kondisi</option>
-                  <option value="baru">Baru dengan Tag (NWT)</option>
-                  <option value="bekas_baik">Bekas Sangat Baik (90%+)</option>
-                  <option value="bekas">Bekas Pemakaian Wajar</option>
+                  <option value="new_with_tag">Baru dengan Tag</option>
+                  <option value="like_new">Seperti Baru</option>
+                  <option value="good">Bagus</option>
+                  <option value="fair">Cukup Baik</option>
                 </select>
               </div>
             </div>

@@ -35,7 +35,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${hanken.variable} antialiased`}
       >
-        <Toaster richColors position="top-center" />
+        <Toaster richColors position="top-left" />
         <AuthProvider>
         <ThemeProvider>
           <QueryProvider>

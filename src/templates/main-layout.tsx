@@ -13,7 +13,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
       </div>
 
       <Navbar />
-      <main className="flex-1 relative z-10">{children}</main>
+      <main className="flex-1 relative z-10 my-10">{children}</main>
       <Footer />
     </div>
   );
