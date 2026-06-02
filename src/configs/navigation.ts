@@ -11,9 +11,10 @@ import {
   Shield,
   Users,
   FileText,
-  AlertTriangle,
+
   BarChart3,
   type LucideIcon,
+  TriangleAlert,
 } from "lucide-react";
 
 export interface NavItem {
@@ -42,7 +43,7 @@ export const adminNavItems: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: Shield },
   { label: "Pengguna", href: "/admin/users", icon: Users },
   { label: "Listing", href: "/admin/listings", icon: FileText },
-  { label: "Komplain", href: "/admin/disputes", icon: AlertTriangle },
+  { label: "Komplain", href: "/admin/disputes", icon: TriangleAlert },
   { label: "Laporan", href: "/admin/reports", icon: BarChart3 },
 ];
 

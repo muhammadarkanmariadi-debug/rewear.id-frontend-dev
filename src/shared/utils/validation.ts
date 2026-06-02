@@ -5,6 +5,10 @@ export const addressSchema = z.object({
   recipientLabel: z.string().min(1, "Label alamat diperlukan (cth: Rumah/Kantor)"),
   phoneNumber: z.string().min(10, "Nomor telepon minimal 10 digit").regex(/^[0-9]+$/, "Hanya boleh berisi angka"),
   fullAddress: z.string().min(10, "Alamat lengkap minimal 10 karakter"),
+  provinceId: z.number({ message: "Provinsi harus dipilih" }).min(1),
+  cityId: z.number({ message: "Kota harus dipilih" }).min(1),
+  district: z.string({ message: "Kecamatan diperlukan" }).min(1, "Kecamatan diperlukan"),
+  postalCode: z.string({ message: "Kode pos diperlukan" }).min(1, "Kode pos diperlukan"),
 });
 
 export type AddressFormValues = z.infer<typeof addressSchema>;

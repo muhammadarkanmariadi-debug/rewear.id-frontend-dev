@@ -8,6 +8,7 @@ export default async function WishlistPage() {
     const res = await userService.getWishlist();
     // Assuming API returns array of products directly, or wrapped in data
     wishlistedItems = res?.data || [];
+    console.log(wishlistedItems)
   } catch (error) {
     console.error("Failed to load wishlist");
   }
@@ -21,8 +22,17 @@ export default async function WishlistPage() {
 
       {wishlistedItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {wishlistedItems.map((product: any) => (
-            <ProductCard key={product.id} product={product} />
+          {wishlistedItems.map((item: any) => (
+            <ProductCard
+              key={item.product.id}
+              product={{
+                ...item.product,
+                price: parseFloat(item.product.price),     
+                is_bookmarked: true,                         
+                brand: item.product.brand ?? null,          
+                seller: item.product.seller ?? null,         
+              }}
+            />
           ))}
         </div>
       ) : (

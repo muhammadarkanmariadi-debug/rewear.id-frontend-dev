@@ -45,9 +45,6 @@ export type {
   ShippingCostRequest,
   ShippingCostOption,
   TrackingEvent,
-  BinderbyteProvince,
-  BinderbyteCity,
-  BinderbyteCourier,
 } from "./shipment";
 
 export type {

@@ -12,4 +12,4 @@ export { userService } from "./user.service";
 export { addressService } from "./address.service";
 export { bankAccountService } from "./bank-account.service";
 export { withdrawalService } from "./withdrawal.service";
-export { binderbyteService } from "./binderbyte.service";
+export { RegionService } from "./region.service";

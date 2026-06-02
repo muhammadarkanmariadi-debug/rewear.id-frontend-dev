@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { Recycle, Mail, Globe, MessageCircle } from "lucide-react";
+import { Label } from "radix-ui";
 
 const footerLinks = {
+  public: {
+    title: "Public",
+    links: [
+      { label: "Beranda", href: "/" },
+      { label: "Tentang Kami", href: "/about" },
+      { label: "Contact", href: "/contact" },
+      { label: "FAQ", href: "/faq" },
+    ],
+  },
   marketplace: {
     title: "Marketplace",
     links: [
@@ -9,6 +19,7 @@ const footerLinks = {
       { label: "Jual Baju", href: "/products/new" },
     ],
   },
+
   akun: {
     title: "Akun",
     links: [
@@ -39,7 +50,7 @@ export function Footer() {
 
       <div className="container mx-auto px-4 md:px-6">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-2 gap-8 py-12 md:grid-cols-4 lg:gap-12">
+        <div className="grid grid-cols-2 gap-8 py-12 md:grid-cols-5 lg:gap-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2 group mb-4">

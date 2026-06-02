@@ -15,7 +15,7 @@ export function Sidebar() {
     { label: "Pesanan Masuk", href: "/orders", icon: Package },
     user?.is_seller_verified && { label: "Katalog Produk", href: "/my-products", icon: ShoppingBag },
     { label: "Wishlist Saya", href: "/wishlist", icon: Heart },
-    { label: "Saldo Escrow", href: "/wallet", icon: Wallet },
+    user?.is_seller_verified && { label: "Saldo Escrow", href: "/wallet", icon: Wallet },
     { label: "Pengaturan Akun", href: "/settings", icon: Settings },
   ].filter(Boolean) as { label: string; href: string; icon: React.ElementType }[];
 
@@ -50,7 +50,7 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Verification Alert */}
+        {/* Verification toast */}
         <div className="bg-surface-container/50 border border-border rounded-xl p-4 mt-auto">
           <h4 className="font-bold text-xs mb-1">Status Toko: Terverifikasi</h4>
           <p className="text-xs text-muted-foreground">Anda dapat mencairkan dana escrow kapan saja.</p>
