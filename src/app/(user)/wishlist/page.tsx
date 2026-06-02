@@ -8,7 +8,6 @@ export default async function WishlistPage() {
     const res = await userService.getWishlist();
     // Assuming API returns array of products directly, or wrapped in data
     wishlistedItems = res?.data || [];
-    console.log(wishlistedItems)
   } catch (error) {
     console.error("Failed to load wishlist");
   }

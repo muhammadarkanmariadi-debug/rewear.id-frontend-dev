@@ -43,7 +43,6 @@ export default function SellerProductsPage() {
           category: category,
           status: status
         });
-        console.log(res)
         if (res.data) {
 
           setProducts(res.data);

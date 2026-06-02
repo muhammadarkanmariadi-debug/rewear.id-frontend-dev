@@ -28,7 +28,6 @@ function VerifyEmailLogic() {
     const verify = async () => {
        try {
          const res = await authService.verifyEmail(uId, uHash, expires, signature);
-         console.log("Verification response:", res);
          
          if (res.status) {
            setSuccess(true);
