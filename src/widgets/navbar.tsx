@@ -100,7 +100,7 @@ export function Navbar() {
                 )}
                 <span className="text-sm font-medium pr-1">{user?.name}</span>
               </Link>
-              <button onClick={async () => { await authService.logout(); logout(); }} title="Keluar" className="flex items-center justify-center hover:bg-red-500/10 w-9 h-9 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
+              <button onClick={async () => { await authService.logout(); logout(); window.location.href = '/login' }} title="Keluar" className="flex items-center justify-center hover:bg-red-500/10 w-9 h-9 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
