@@ -1,33 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
 import { Mail, Send } from "lucide-react";
 import { useState } from "react";
-import { authService } from "@/services";
+import { useForgotPassword } from "@/hooks/api/use-auth";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { mutate: forgotPassword, isPending: loading } = useForgotPassword();
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      const res = await authService.forgotPassword(email);
-      if (res.status) {
+    forgotPassword(email, {
+      onSuccess: () => {
         setSuccess(true);
-      } else {
-        setError(res.message || "Gagal mengirim link reset kata sandi.");
+      },
+      onError: (err: any) => {
+        setError(err.message || "Gagal mengirim link reset kata sandi.");
       }
-    } catch (err) {
-      setError("Terjadi kesalahan pada server.");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   if (success) {

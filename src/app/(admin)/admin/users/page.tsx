@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { adminService } from "@/services";
-import { toast } from "sonner";
+import { useState } from "react";
 import { Search, Ban, Undo2, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { DataPagination } from "@/widgets/data-pagination";
+import { useAdminUsers, useBanUser, useUnbanUser } from "@/hooks/api/use-admin";
 
 interface User {
   id: string;
@@ -18,53 +17,24 @@ interface User {
 }
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await adminService.getUsers({ search, page: currentPage, per_page: perPage });
-      if (res.data) {
-        setUsers(res.data);
-        if (res.meta?.last_page) setLastPage(res.meta.last_page);
-      }
-    } catch {
-      toast.error("Gagal memuat pengguna.");
-    } finally {
-      setLoading(false);
-    }
-  }, [search, currentPage, perPage]);
+  const { data: res, isLoading: loading } = useAdminUsers({ search, page: currentPage, per_page: perPage });
+  const users = res?.data || [];
+  const lastPage = res?.meta?.last_page || 1;
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchUsers();
-    }, 500);
-    return () => clearTimeout(delay);
-  }, [fetchUsers]);
+  const { mutate: banUser, isPending: banLoading } = useBanUser();
+  const { mutate: unbanUser, isPending: unbanLoading } = useUnbanUser();
+  const actionLoading = banLoading || unbanLoading;
 
-  const handleBan = async (id: string, isBanned: boolean) => {
+  const handleBan = (id: string, isBanned: boolean) => {
     if (!window.confirm(`Yakin ingin ${isBanned ? 'membuka blokir' : 'memblokir'} pengguna ini?`)) return;
-    try {
-      setActionLoading(id);
-      if (isBanned) {
-        await adminService.unbanUser(id);
-        toast.success("Pengguna berhasil dibuka blokirnya.");
-      } else {
-        await adminService.banUser(id);
-        toast.success("Pengguna berhasil diblokir.");
-      }
-      fetchUsers();
-    } catch {
-      toast.error("Gagal mengubah status pengguna.");
-    } finally {
-      setActionLoading(null);
+    if (isBanned) {
+      unbanUser(id);
+    } else {
+      banUser(id);
     }
   };
 
@@ -114,7 +84,7 @@ export default function AdminUsersPage() {
                 <tr>
                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">Tidak ada pengguna ditemukan.</td>
                 </tr>
-              ) : users.map((user) => (
+              ) : users.map((user: User) => (
                 <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -149,7 +119,7 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">
                     <div className="flex justify-end">
                       <button
-                        disabled={actionLoading === user.id}
+                        disabled={actionLoading}
                         onClick={() => handleBan(user.id, user.is_banned)}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 ${
                           user.is_banned 
@@ -157,7 +127,7 @@ export default function AdminUsersPage() {
                             : "bg-red-500/10 text-red-600 hover:bg-red-500/20"
                         }`}
                       >
-                        {actionLoading === user.id ? "Memproses..." : user.is_banned ? <><Undo2 className="w-3.5 h-3.5" /> Buka Blokir</> : <><Ban className="w-3.5 h-3.5" /> Blokir</>}
+                        {actionLoading ? "Memproses..." : user.is_banned ? <><Undo2 className="w-3.5 h-3.5" /> Buka Blokir</> : <><Ban className="w-3.5 h-3.5" /> Blokir</>}
                       </button>
                     </div>
                   </td>

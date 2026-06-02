@@ -1,61 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
-import { adminService } from "@/services";
-import { toast } from "sonner";
+import { useState } from "react";
 import { formatRupiah } from "@/shared/utils/format";
 import { format } from "date-fns";
 import { Search, Gavel, ArrowLeftRight, CheckCircle2 } from "lucide-react";
 import { DataPagination } from "@/widgets/data-pagination";
+import { useAdminDisputes, useResolveDispute } from "@/hooks/api/use-admin";
 
 export default function AdminDisputesPage() {
-  const [disputes, setDisputes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 
-  const fetchDisputes = async () => {
-    try {
-      setLoading(true);
-      const res = await adminService.getDisputes({ search, page: currentPage, per_page: perPage });
-      if (res.data) {
-        setDisputes(res.data);
-        if (res.meta?.last_page) setLastPage(res.meta.last_page);
-      }
-    } catch (err) {
-      toast.error("Gagal memuat daftar sengketa.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: res, isLoading: loading } = useAdminDisputes({ search, page: currentPage, per_page: perPage });
+  const disputes = res?.data || [];
+  const lastPage = res?.meta?.last_page || 1;
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchDisputes();
-    }, 500);
-    return () => clearTimeout(delay);
-  }, [search, currentPage, perPage]);
+  const { mutate: resolveDispute, isPending: actionLoading } = useResolveDispute();
 
-  const handleResolve = async (id: string, type: "refund" | "release") => {
+  const handleResolve = (id: string, type: "refund" | "release") => {
     const actionText = type === "refund" ? "mengembalikan dana ke pembeli" : "meneruskan dana ke penjual";
     const notes = window.prompt(`Catatan admin untuk aksi ${actionText}:`);
     if (notes === null) return;
-    
-    try {
-      setActionLoading(id);
-      await adminService.resolveDispute(id, type, notes);
-      toast.success(`Sengketa diselesaikan. Dana ${type === "refund" ? "dikembalikan ke pembeli" : "diteruskan ke penjual"}.`);
-      fetchDisputes();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal menyelesaikan sengketa.");
-    } finally {
-      setActionLoading(null);
-    }
+    resolveDispute({ id, resolution_type: type, admin_notes: notes });
   };
 
   return (
@@ -103,7 +71,7 @@ export default function AdminDisputesPage() {
                 <tr>
                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">Tidak ada sengketa ditemukan.</td>
                 </tr>
-              ) : disputes.map((d) => (
+              ) : disputes.map((d: any) => (
                 <tr key={d.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4 align-top">
                     <p className="font-semibold text-xs text-primary mb-1">#{d.order?.order_number}</p>
@@ -132,18 +100,18 @@ export default function AdminDisputesPage() {
                     {d.status !== 'resolved' ? (
                       <div className="flex flex-col items-end gap-2">
                         <button
-                          disabled={actionLoading === d.id}
+                          disabled={actionLoading}
                           onClick={() => handleResolve(d.id, 'refund')}
                           className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 w-40"
                         >
-                          {actionLoading === d.id ? "..." : <><ArrowLeftRight className="w-3.5 h-3.5" /> Refund Pembeli</>}
+                          {actionLoading ? "..." : <><ArrowLeftRight className="w-3.5 h-3.5" /> Refund Pembeli</>}
                         </button>
                         <button
-                          disabled={actionLoading === d.id}
+                          disabled={actionLoading}
                           onClick={() => handleResolve(d.id, 'release')}
                           className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 bg-green-500/10 text-green-600 hover:bg-green-500/20 w-40"
                         >
-                          {actionLoading === d.id ? "..." : <><CheckCircle2 className="w-3.5 h-3.5" /> Teruskan ke Penjual</>}
+                          {actionLoading ? "..." : <><CheckCircle2 className="w-3.5 h-3.5" /> Teruskan ke Penjual</>}
                         </button>
                       </div>
                     ) : (

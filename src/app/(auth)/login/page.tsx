@@ -1,28 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { useState } from "react";
-import { authService } from "@/services";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth.store";
+import { useLogin } from "@/hooks/api/use-auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const { mutate: login, isPending: loading } = useLogin();
+
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      const res = await authService.login(email, password);
-
-      if (res.status) {
+    login({ email, password }, {
+      onSuccess: (res) => {
         useAuthStore.getState().setAuth(res.data.user, res.data.token);
 
         // Cek jika ada callbackUrl di query string
@@ -43,15 +42,11 @@ export default function LoginPage() {
         } else {
           router.push("/");
         }
-
-      } else {
-        setError(res.message || "Gagal masuk. Periksa kembali detail Anda.");
+      },
+      onError: (err: any) => {
+        setError(err.message || "Gagal masuk. Periksa kembali detail Anda.");
       }
-    } catch (err) {
-      setError("Terjadi kesalahan pada server.");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (

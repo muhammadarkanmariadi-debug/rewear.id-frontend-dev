@@ -1,60 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
-import { adminService } from "@/services";
-import { toast } from "sonner";
+import { useState } from "react";
 import { Search, Trash2 } from "lucide-react";
 import { formatRupiah } from "@/shared/utils/format";
 import { DataPagination } from "@/widgets/data-pagination";
 import { Product } from "@/entities";
+import { useAdminProducts, useDeleteAdminProduct } from "@/hooks/api/use-admin";
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const res = await adminService.getProducts({ search, page: currentPage, per_page: perPage });
-      if (res.data) {
-        setProducts(res.data);
-        if (res.meta?.last_page) setLastPage(res.meta.last_page);
-      }
-    } catch (err) {
-      toast.error("Gagal memuat produk.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: res, isLoading: loading } = useAdminProducts({ search, page: currentPage, per_page: perPage });
+  const products = res?.data || [];
+  const lastPage = res?.meta?.last_page || 1;
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchProducts();
-    }, 500);
-    return () => clearTimeout(delay);
-  }, [search, currentPage, perPage]);
+  const { mutate: deleteProduct, isPending: actionLoading } = useDeleteAdminProduct();
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     const reason = window.prompt("Alasan penghapusan produk (melanggar aturan, dll):");
     if (reason === null) return;
-    
-    try {
-      setActionLoading(id);
-      await adminService.deleteProduct(id, reason || "Melanggar kebijakan platform");
-      toast.success("Produk berhasil dihapus oleh admin.");
-      fetchProducts();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal menghapus produk.");
-    } finally {
-      setActionLoading(null);
-    }
+    deleteProduct({ id, reason: reason || "Melanggar kebijakan platform" });
   };
 
   return (
@@ -103,7 +70,7 @@ export default function AdminProductsPage() {
                 <tr>
                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">Tidak ada produk ditemukan.</td>
                 </tr>
-              ) : products.map((product) => (
+              ) : products.map((product: Product) => (
                 <tr key={product.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
@@ -128,11 +95,11 @@ export default function AdminProductsPage() {
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
                       <button
-                        disabled={actionLoading === product.id}
+                        disabled={actionLoading}
                         onClick={() => handleDelete(product.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 bg-red-500/10 text-red-600 hover:bg-red-500/20"
                       >
-                        {actionLoading === product.id ? "Memproses..." : <><Trash2 className="w-3.5 h-3.5" /> Hapus Paksa</>}
+                        {actionLoading ? "Memproses..." : <><Trash2 className="w-3.5 h-3.5" /> Hapus Paksa</>}
                       </button>
                     </div>
                   </td>

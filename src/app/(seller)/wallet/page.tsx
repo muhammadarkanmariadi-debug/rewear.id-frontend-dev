@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { formatRupiah } from "@/shared/utils/format";
 import { ArrowDownToLine, Receipt, Wallet } from "lucide-react";
-import { authService, bankAccountService, withdrawalService } from "@/services";
 import { toast } from "sonner";
+import { useBankAccounts, useWalletWithdrawals, useAddBankAccount, useRequestWalletWithdrawal } from "@/hooks/api/use-wallet";
+import { useAuthMe } from "@/hooks/api/use-auth";
 
 interface BankAccountItem {
   id: string;
@@ -25,90 +26,58 @@ interface WithdrawalItem {
 }
 
 export default function WalletPage() {
-  const [bankAccounts, setBankAccounts] = useState<BankAccountItem[]>([]);
-  const [withdrawals, setWithdrawals] = useState<WithdrawalItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: resBanks, isLoading: loadingBanks } = useBankAccounts();
+  const bankAccounts = resBanks?.data || [];
+  
+  const { data: resWithdrawals, isLoading: loadingWithdrawals } = useWalletWithdrawals();
+  const withdrawals = resWithdrawals?.data || [];
+
+  const { data: resAuth, isLoading: loadingAuth } = useAuthMe();
+  const balance = resAuth?.data?.balance || 0;
+
+  const loading = loadingBanks || loadingWithdrawals || loadingAuth;
+
   const [amount, setAmount] = useState<number>(0);
   const [selectedBankId, setSelectedBankId] = useState<string>("");
-  const [balance, setBalance] = useState<number>(0);
-
-  // State untuk form tambah rekening
-  const [showAddBank, setShowAddBank] = useState(false);
-  const [newBank, setNewBank] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
-  const [isSubmittingBank, setIsSubmittingBank] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      const [banksRes, withRes, userRes] = await Promise.all([
-        bankAccountService.getAll(),
-        withdrawalService.getAll(),
-        authService.getMe()
-      ]);
-      if (banksRes.status && banksRes.data) {
-        setBankAccounts(banksRes.data);
-        if (banksRes.data.length) setSelectedBankId(banksRes.data[0].id);
-      }
-      if (withRes.status && withRes.data) {
-        setWithdrawals(withRes.data);
-      }
-      if (userRes.status && userRes.data) {
-        setBalance(userRes.data.balance || 0);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (bankAccounts.length > 0 && !selectedBankId) {
+      setSelectedBankId(bankAccounts[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bankAccounts.length, selectedBankId, bankAccounts]);
 
-  const handleAddBank = async (e: React.FormEvent) => {
+  const [showAddBank, setShowAddBank] = useState(false);
+  const [newBank, setNewBank] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
+  
+  const { mutate: addBankAccount, isPending: isSubmittingBank } = useAddBankAccount();
+  const { mutate: requestWithdrawal, isPending: isWithdrawing } = useRequestWalletWithdrawal();
+
+  const handleAddBank = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBank.bank_name || !newBank.account_number || !newBank.account_holder_name) {
       return toast.warning("Semua kolom rekening wajib diisi");
     }
-    setIsSubmittingBank(true);
-    try {
-      const res = await bankAccountService.create(newBank);
-      if (res.status) {
-        toast.success("Rekening berhasil ditambahkan!");
+    addBankAccount(newBank, {
+      onSuccess: () => {
         setNewBank({ bank_name: "", account_number: "", account_holder_name: "" });
         setShowAddBank(false);
-        fetchData();
-      } else {
-        toast.error(res.message || "Gagal menambahkan rekening");
       }
-    } catch (err) {
-      toast.error("Terjadi kesalahan saat menyimpan rekening");
-      console.error(err);
-    } finally {
-      setIsSubmittingBank(false);
-    }
+    });
   };
 
-  const handleWithdraw = async () => {
+  const handleWithdraw = () => {
     if (!selectedBankId || amount < 50000) return toast.warning("Minimal penarikan Rp50.000");
     if (amount > balance) return toast.warning("Saldo tidak mencukupi");
 
-    try {
-      const res = await withdrawalService.request({
-        bank_account_id: selectedBankId,
-        amount
-      });
-      if (res.status) {
-        toast.success("Permintaan penarikan berhasil dibuat!");
+    requestWithdrawal({
+      bank_account_id: selectedBankId,
+      amount
+    }, {
+      onSuccess: () => {
         setAmount(0);
-        fetchData();
-      } else {
-        toast.error(res.message || "Gagal melakukan penarikan dana");
       }
-    } catch (err) {
-      toast.error("Gagal melakukan penarikan dana");
-      console.error(err);
-    }
+    });
   };
 
   if (loading) return <div className="p-8 text-center">Loading wallet...</div>;
@@ -180,7 +149,7 @@ export default function WalletPage() {
                 {bankAccounts.length === 0 ? (
                   <p className="text-sm">Belum ada bank yang tertaut.</p>
                 ) : (
-                  bankAccounts.map((b) => (
+                  bankAccounts.map((b: BankAccountItem) => (
                     <div key={b.id} className="bg-background/10 rounded-xl p-4 border border-background/20 backdrop-blur-sm flex justify-between items-center">
                       <p className="font-bold flex items-center gap-3">
                         <span className="opacity-70">{b.bank_name}</span>
@@ -207,7 +176,7 @@ export default function WalletPage() {
               onChange={(e) => setSelectedBankId(e.target.value)}
             >
               <option value="" disabled>Pilih Rekening Tujuan</option>
-              {bankAccounts.map(b => (
+              {bankAccounts.map((b: BankAccountItem) => (
                 <option key={b.id} value={b.id}>{b.bank_name} - {b.account_number}</option>
               ))}
             </select>
@@ -224,10 +193,10 @@ export default function WalletPage() {
             </div>
             <button
               onClick={handleWithdraw}
-              disabled={!selectedBankId}
+              disabled={!selectedBankId || isWithdrawing}
               className="w-full h-12 bg-foreground text-background font-bold rounded-xl shadow-md hover:bg-foreground/90 transition-transform active:scale-[0.98] flex justify-center items-center gap-2 disabled:opacity-50"
             >
-              <ArrowDownToLine className="w-4 h-4" /> Cairkan Dana
+              <ArrowDownToLine className="w-4 h-4" /> {isWithdrawing ? "Memproses..." : "Cairkan Dana"}
             </button>
           </div>
         </div>
@@ -250,7 +219,7 @@ export default function WalletPage() {
             {withdrawals.length === 0 ? (
               <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">Belum ada riwayat penarikan</td></tr>
             ) : (
-              withdrawals.map((w) => (
+              withdrawals.map((w: WithdrawalItem) => (
                 <tr key={w.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4 font-mono font-bold text-xs"><Receipt className="w-4 h-4 inline mr-2 text-muted-foreground" />WD-{w.id.slice(-6)}</td>
                   <td className="px-6 py-4 font-bold">{formatRupiah(w.amount)}</td>

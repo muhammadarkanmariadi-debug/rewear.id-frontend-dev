@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { productService } from "@/services";
 import { toast } from "sonner";
 import { CldUploadWidget } from "next-cloudinary";
+import { useCategories, useCreateProduct } from "@/hooks/api/use-product";
 
 export default function NewProductPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     category_id: "",
@@ -24,51 +23,40 @@ export default function NewProductPage() {
     weight: 1000, 
     stock: 1
   });
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const { data: resCat } = useCategories();
+  const categories = resCat?.data || [];
 
-  useEffect(() => {
-    productService.getCategories().then((res) => {
-      if (res.data) setCategories(res.data);
-    });
-  }, []);
+  const { mutate: createProduct, isPending: loading } = useCreateProduct();
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     
-    try {
-      if (imageUrls.length === 0) throw new Error("Silakan unggah foto produk terlebih dahulu.");
-
-      const payload: Record<string, any> = {
-        title: formData.title,
-        brand: formData.brand || null,
-        category_id: formData.category_id,
-        condition: formData.condition,
-        size: formData.size,
-        description: formData.description,
-        price: Number(formData.price),
-        weight_grams: Number(formData.weight),
-        stock: Number(formData.stock),
-        images: imageUrls
-      };
-
-      const res = await productService.create(payload);
-      
-      if (!res.status) {
-         throw new Error(res.message || "Gagal membuat produk");
-      }
-
-      toast.success("Produk berhasil ditambahkan!");
-      router.push("/my-products");
-      router.refresh();
-      
-    } catch (err: any) {
-      toast.error(err.message || "Terjadi kesalahan");
-    } finally {
-      setLoading(false);
+    if (imageUrls.length === 0) {
+      toast.error("Silakan unggah foto produk terlebih dahulu.");
+      return;
     }
+
+    const payload: Record<string, any> = {
+      title: formData.title,
+      brand: formData.brand || null,
+      category_id: formData.category_id,
+      condition: formData.condition,
+      size: formData.size,
+      description: formData.description,
+      price: Number(formData.price),
+      weight_grams: Number(formData.weight),
+      stock: Number(formData.stock),
+      images: imageUrls
+    };
+
+    createProduct(payload, {
+      onSuccess: () => {
+        router.push("/my-products");
+        router.refresh();
+      }
+    });
   };
 
   return (
@@ -145,7 +133,7 @@ export default function NewProductPage() {
                         value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})}
                         className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-foreground/20">
                   <option value="">Pilih Kategori</option>
-                  {categories.map((cat) => (
+                  {categories.map((cat: any) => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>

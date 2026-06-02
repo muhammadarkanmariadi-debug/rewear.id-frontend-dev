@@ -1,57 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
-import { adminService } from "@/services";
-import { toast } from "sonner";
+import { useState } from "react";
 import { CheckCircle2, Search, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { DataPagination } from "@/widgets/data-pagination";
+import { useAdminSellerVerifications, useVerifySeller } from "@/hooks/api/use-admin";
 
 export default function AdminSellerVerificationsPage() {
-  const [verifications, setVerifications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
+  
+  // Custom Hook Query
+  const { data: res, isLoading: loading } = useAdminSellerVerifications({ 
+    search, 
+    page: currentPage, 
+    per_page: perPage 
+  });
+  
+  // Custom Hook Mutation
+  const { mutate: verifySeller, isPending: actionLoading } = useVerifySeller();
 
-  const fetchVerifications = async () => {
-    try {
-      setLoading(true);
-      const res = await adminService.getSellerVerifications({ search, page: currentPage, per_page: perPage });
-      if (res.data) {
-        setVerifications(res.data);
-        if (res.meta?.last_page) setLastPage(res.meta.last_page);
-      }
-    } catch (err) {
-      toast.error("Gagal memuat daftar verifikasi.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const verifications = res?.data || [];
+  const lastPage = res?.meta?.last_page || 1;
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchVerifications();
-    }, 500);
-    return () => clearTimeout(delay);
-  }, [search, currentPage, perPage]);
-
-  const handleVerify = async (id: string) => {
+  const handleVerify = (id: string) => {
     if (!window.confirm("Setujui verifikasi KTP pengguna ini menjadi penjual?")) return;
-    try {
-      setActionLoading(id);
-      await adminService.verifySeller(id);
-      toast.success("Verifikasi penjual berhasil disetujui.");
-      fetchVerifications();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal menyetujui verifikasi.");
-    } finally {
-      setActionLoading(null);
-    }
+    verifySeller(id);
   };
 
   return (
@@ -99,7 +75,7 @@ export default function AdminSellerVerificationsPage() {
                 <tr>
                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">Tidak ada permintaan verifikasi yang tertunda.</td>
                 </tr>
-              ) : verifications.map((user) => (
+              ) : verifications.map((user: any) => (
                 <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-semibold">{user.name}</p>
@@ -120,11 +96,11 @@ export default function AdminSellerVerificationsPage() {
                   <td className="px-6 py-4">
                     <div className="flex justify-end">
                       <button
-                        disabled={actionLoading === user.id}
+                        disabled={actionLoading}
                         onClick={() => handleVerify(user.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 bg-green-500/10 text-green-600 hover:bg-green-500/20"
                       >
-                        {actionLoading === user.id ? "Memproses..." : <><CheckCircle2 className="w-3.5 h-3.5" /> Setujui Verifikasi</>}
+                        {actionLoading ? "Memproses..." : <><CheckCircle2 className="w-3.5 h-3.5" /> Setujui Verifikasi</>}
                       </button>
                     </div>
                   </td>

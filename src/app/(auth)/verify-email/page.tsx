@@ -1,14 +1,16 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-import { authService } from "@/services";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useVerifyEmail } from "@/hooks/api/use-auth";
 
 function VerifyEmailLogic() {
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const searchParams = useSearchParams();
@@ -18,33 +20,29 @@ function VerifyEmailLogic() {
   const expires = searchParams.get("expires");
   const signature = searchParams.get("signature");
 
+  const { mutate: verifyEmail, isPending: loading, isIdle } = useVerifyEmail();
+
   useEffect(() => {
     if (!uId || !uHash || !expires || !signature) {
+      // eslint-disable-next-line
       setError("Tautan verifikasi tidak lengkap.");
-      setLoading(false);
       return;
     }
 
-    const verify = async () => {
-       try {
-         const res = await authService.verifyEmail(uId, uHash, {
-           expires,
-           signature
-         });
-         
-         if (res.status) {
-           setSuccess(true);
-         } else {
-           setError(res.message || "Verifikasi gagal atau link sudah kedaluwarsa.");
-         }
-       } catch (err) {
-         setError("Terjadi kesalahan pada server saat memverifikasi tautan.");
-       } finally {
-         setLoading(false);
-       }
-    };
-
-    verify();
+    if (isIdle) {
+      verifyEmail({
+        uId,
+        uHash,
+        params: { expires, signature }
+      }, {
+        onSuccess: () => {
+          setSuccess(true);
+        },
+        onError: (err: any) => {
+          setError(err.message || "Verifikasi gagal atau link sudah kedaluwarsa.");
+        }
+      });
+    }
   }, [uId, uHash, expires, signature]);
 
   if (loading) {

@@ -1,43 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
 import { User, Mail, Lock, UserPlus } from "lucide-react";
 import { useState } from "react";
-import { authService } from "@/services";
 import { useRouter } from "next/navigation";
+import { useRegister } from "@/hooks/api/use-auth";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const { mutate: register, isPending: loading } = useRegister();
+
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       return setError("Kata sandi dan konfirmasi sandi tidak cocok.");
     }
 
-    setLoading(true);
     setError("");
 
-    try {
-      const res = await authService.register(name, email, password, confirmPassword);
-      if (res.status) {
+    register({ name, email, password, password_confirmation: confirmPassword }, {
+      onSuccess: () => {
         setSuccess(true);
         setTimeout(() => router.push("/verify-email-pending"), 3000);
-      } else {
-        setError(res.message || "Gagal mendaftar. Periksa kembali detail Anda.");
+      },
+      onError: (err: any) => {
+        setError(err.message || "Gagal mendaftar. Periksa kembali detail Anda.");
       }
-    } catch (err) {
-      setError("Terjadi kesalahan pada server.");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   if (success) {

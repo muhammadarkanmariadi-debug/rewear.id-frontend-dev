@@ -1,25 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { formatRupiah } from "@/shared/utils/format";
 import { Search, Plus, Edit } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { productService } from "@/services";
 import { Product } from "@/entities/product";
-import { toast } from "sonner";
 import { DataPagination } from "@/widgets/data-pagination";
+import { useSellerProducts } from "@/hooks/api/use-product";
 
 export default function SellerProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
   
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -32,31 +27,17 @@ export default function SellerProductsPage() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  useEffect(() => {
-    async function fetchProducts() {
-      setLoading(true);
-      try {
-        const res = await productService.getSellerProducts({
-          page: currentPage.toString(),
-          per_page: perPage.toString(),
-          search: debouncedSearch,
-          category: category,
-          status: status
-        });
-        console.log(res)
-        if (res.data) {
+  const { data: res, isLoading: loading } = useSellerProducts({
+    page: currentPage.toString(),
+    per_page: perPage.toString(),
+    search: debouncedSearch,
+    category: category,
+    status: status
+  });
 
-          setProducts(res.data);
-          if (res.meta?.last_page) setLastPage(res.meta.last_page);
-        }
-      } catch {
-        toast.error("Gagal memuat produk.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, [currentPage, debouncedSearch, category, status, perPage]);
+  const products = res?.data || [];
+  const lastPage = res?.meta?.last_page || 1;
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">

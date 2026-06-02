@@ -1,75 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
-import { adminService } from "@/services";
-import { toast } from "sonner";
+import { useState } from "react";
 import { formatRupiah } from "@/shared/utils/format";
 import { format } from "date-fns";
 import { CheckCircle2, XCircle, Search } from "lucide-react";
 import { DataPagination } from "@/widgets/data-pagination";
+import { useAdminWithdrawals, useApproveWithdrawal, useRejectWithdrawal } from "@/hooks/api/use-admin";
+import { toast } from "sonner";
 
 export default function AdminWithdrawalsPage() {
-  const [withdrawals, setWithdrawals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 
-  const fetchWithdrawals = async () => {
-    try {
-      setLoading(true);
-      const res = await adminService.getWithdrawals({ search, page: currentPage, per_page: perPage });
-      if (res.data) {
-        setWithdrawals(res.data);
-        if (res.meta?.last_page) setLastPage(res.meta.last_page);
-      }
-    } catch (err) {
-      toast.error("Gagal memuat permintaan penarikan.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: res, isLoading: loading } = useAdminWithdrawals({ search, page: currentPage, per_page: perPage });
+  const withdrawals = res?.data || [];
+  const lastPage = res?.meta?.last_page || 1;
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchWithdrawals();
-    }, 500);
-    return () => clearTimeout(delay);
-  }, [search, currentPage, perPage]);
+  const { mutate: approveWithdrawal, isPending: approveLoading } = useApproveWithdrawal();
+  const { mutate: rejectWithdrawal, isPending: rejectLoading } = useRejectWithdrawal();
+  const actionLoading = approveLoading || rejectLoading;
 
-  const handleApprove = async (id: string) => {
+  const handleApprove = (id: string) => {
     if (!window.confirm("Setujui penarikan dana ini? Pastikan Anda telah mentransfer dana ke rekening penjual.")) return;
-    try {
-      setActionLoading(id);
-      await adminService.approveWithdrawal(id);
-      toast.success("Penarikan disetujui.");
-      fetchWithdrawals();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal menyetujui penarikan.");
-    } finally {
-      setActionLoading(null);
-    }
+    approveWithdrawal(id);
   };
 
-  const handleReject = async (id: string) => {
+  const handleReject = (id: string) => {
     const reason = window.prompt("Alasan penolakan (dana akan dikembalikan ke saldo penjual):");
     if (reason === null) return;
     if (!reason.trim()) return toast.error("Alasan penolakan harus diisi.");
-
-    try {
-      setActionLoading(id);
-      await adminService.rejectWithdrawal(id, reason);
-      toast.success("Penarikan ditolak dan dana dikembalikan.");
-      fetchWithdrawals();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal menolak penarikan.");
-    } finally {
-      setActionLoading(null);
-    }
+    rejectWithdrawal({ id, reason });
   };
 
   return (
@@ -117,7 +79,7 @@ export default function AdminWithdrawalsPage() {
                 <tr>
                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">Tidak ada permintaan penarikan yang tertunda.</td>
                 </tr>
-              ) : withdrawals.map((w) => (
+              ) : withdrawals.map((w: any) => (
                 <tr key={w.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-semibold">{w.user?.name || "Unknown"}</p>
@@ -143,18 +105,18 @@ export default function AdminWithdrawalsPage() {
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
                       <button
-                        disabled={actionLoading === w.id}
+                        disabled={actionLoading}
                         onClick={() => handleReject(w.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 bg-red-500/10 text-red-600 hover:bg-red-500/20"
                       >
-                        {actionLoading === w.id ? "..." : <><XCircle className="w-3.5 h-3.5" /> Tolak</>}
+                        {actionLoading ? "..." : <><XCircle className="w-3.5 h-3.5" /> Tolak</>}
                       </button>
                       <button
-                        disabled={actionLoading === w.id}
+                        disabled={actionLoading}
                         onClick={() => handleApprove(w.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 bg-green-500/10 text-green-600 hover:bg-green-500/20"
                       >
-                        {actionLoading === w.id ? "Memproses..." : <><CheckCircle2 className="w-3.5 h-3.5" /> Setujui</>}
+                        {actionLoading ? "Memproses..." : <><CheckCircle2 className="w-3.5 h-3.5" /> Setujui</>}
                       </button>
                     </div>
                   </td>

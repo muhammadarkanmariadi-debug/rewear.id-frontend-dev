@@ -1,16 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import Link from "next/link";
 import { Lock, Save } from "lucide-react";
-import { useState, useEffect } from "react";
-import { authService } from "@/services";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { useResetPassword } from "@/hooks/api/use-auth";
 
 function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
@@ -21,11 +19,14 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token || !email) {
+      // eslint-disable-next-line
       setError("Tautan reset tidak valid. Pastikan Anda membuka link dari email secara utuh.");
     }
   }, [token, email]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { mutate: resetPassword, isPending: loading } = useResetPassword();
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!token || !email) return;
 
@@ -33,27 +34,22 @@ function ResetPasswordForm() {
       return setError("Kata sandi dan konfirmasi sandi tidak cocok.");
     }
 
-    setLoading(true);
     setError("");
 
-    try {
-      const res = await authService.resetPassword({
-        email,
-        token,
-        password,
-        password_confirmation: confirmPassword
-      });
-      if (res.status) {
+    resetPassword({
+      email,
+      token,
+      password,
+      password_confirmation: confirmPassword
+    }, {
+      onSuccess: () => {
         setSuccess(true);
         setTimeout(() => router.push("/login"), 3000);
-      } else {
-        setError(res.message || "Gagal mereset kata sandi.");
+      },
+      onError: (err: any) => {
+        setError(err.message || "Gagal mereset kata sandi.");
       }
-    } catch (err) {
-      setError("Terjadi kesalahan pada server.");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   if (success) {
