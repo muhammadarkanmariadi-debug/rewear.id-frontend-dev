@@ -4,9 +4,10 @@ import { productService } from "@/services";
 import { ProductGallery } from "@/widgets/product/product-gallery";
 import { SellerMiniProfile } from "@/widgets/product/seller-mini-profile";
 import { formatRupiah } from "@/shared/utils/format";
-import { ShieldCheck, Share2, Info, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Info, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { BookmarkButton } from "@/widgets/product/bookmark-button";
+import { ProductShareButton } from "@/widgets/product/product-share-button";
 import { Metadata } from "next";
 import { Product } from "@/entities";
 
@@ -20,6 +21,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const { slug } = await params;
   const res = await productService.getById(slug);
   const product = res.data;
+  console.log(product)
 
   if (!product) return { title: "Produk Tidak Ditemukan" };
 
@@ -134,9 +136,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 </Link>
                 <div className="flex gap-3">
                   <BookmarkButton productId={product.id} initialStatus={product.is_bookmarked ?? false} />
-                  <button className="flex justify-center items-center bg-surface-container hover:bg-accent border border-border rounded-xl w-12 h-12 font-semibold text-foreground transition-all shrink-0">
-                    <Share2 className="w-4 h-4" />
-                  </button>
+                  <ProductShareButton product={product} />
                 </div>
               </div>
             </div>

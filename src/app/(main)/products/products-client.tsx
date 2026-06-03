@@ -20,6 +20,8 @@ export function ProductsClient({ initialProducts }: { initialProducts: any[] }) 
     filteredProducts
   } = useProductFiltering(initialProducts);
 
+  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 

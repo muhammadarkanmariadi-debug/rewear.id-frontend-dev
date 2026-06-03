@@ -9,6 +9,7 @@ export const metadata = {
 export default async function ProductsPage() {
   const res = await productService.getAll();
   const products = res.data || [];
+  console.log(products)
 
   return <ProductsClient initialProducts={products} />;
 }
