@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useState, useEffect } from "react";
 
@@ -14,7 +16,7 @@ export function ProductsClient({ initialProducts }: { initialProducts: any[] }) 
     condition, setCondition,
     minPrice, setMinPrice,
     maxPrice, setMaxPrice,
-    sortBy, setSortBy,
+    sortBy, setSortBy, 
     filteredProducts
   } = useProductFiltering(initialProducts);
 

@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
 
+import { AnimatedStat } from "@/components/ui/animated-stat";
+
 function StarIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -17,9 +19,9 @@ function StarIcon({ className }: { className?: string }) {
 }
 
 const STATS = [
-  { value: "200+", label: "International Brands" },
-  { value: "2,000+", label: "High-Quality Products" },
-  { value: "30,000+", label: "Happy Customers" },
+  { value: 200, suffix: "+", label: "International Brands", separator: "" },
+  { value: 2000, suffix: "+", label: "High-Quality Products", separator: "," },
+  { value: 30000, suffix: "+", label: "Happy Customers", separator: "," },
 ];
 
 
@@ -64,20 +66,38 @@ export function HeroSection() {
             </div>
 
             {/* Stats 2+1 */}
-            <div className="mt-8 flex items-stretch border-b border-border pb-5">
-              <div className="flex-1 flex flex-col">
-                <p className="text-2xl font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>200+</p>
-                <p className="text-[11px] text-muted-foreground mt-1">International Brands</p>
-              </div>
+            <div className="mt-8 flex items-stretch border-b border-border pb-5 overflow-hidden">
+              <AnimatedStat 
+                index={0}
+                value={200} 
+                suffix="+" 
+                label="International Brands" 
+                className="flex-1"
+                valueClassName="text-2xl"
+                labelClassName="text-[11px]"
+              />
               <div className="w-px bg-border self-stretch mx-4" />
-              <div className="flex-1 flex flex-col">
-                <p className="text-2xl font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>2,000+</p>
-                <p className="text-[11px] text-muted-foreground mt-1">High-Quality Products</p>
-              </div>
+              <AnimatedStat 
+                index={1}
+                value={2000} 
+                suffix="+" 
+                separator=","
+                label="High-Quality Products" 
+                className="flex-1"
+                valueClassName="text-2xl"
+                labelClassName="text-[11px]"
+              />
             </div>
-            <div className="pt-5 mb-4">
-              <p className="text-2xl font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>30,000+</p>
-              <p className="text-[11px] text-muted-foreground mt-1">Happy Customers</p>
+            <div className="pt-5 mb-4 overflow-hidden">
+              <AnimatedStat 
+                index={2}
+                value={30000} 
+                suffix="+" 
+                separator=","
+                label="Happy Customers" 
+                valueClassName="text-2xl"
+                labelClassName="text-[11px]"
+              />
             </div>
           </div>
 
@@ -122,14 +142,19 @@ export function HeroSection() {
             </div>
 
             {/* Stats horizontal */}
-            <div className="mt-8 flex items-stretch divide-x divide-border">
-              {STATS.map((stat) => (
-                <div key={stat.label} className="pr-5 first:pl-0 [&:not(:first-child)]:pl-5">
-                  <p className="text-[1.4rem] font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>
-                    {stat.value}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground mt-1">{stat.label}</p>
-                </div>
+            <div className="mt-8 flex items-stretch divide-x divide-border overflow-hidden">
+              {STATS.map((stat, i) => (
+                <AnimatedStat
+                  key={stat.label}
+                  index={i}
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  separator={stat.separator}
+                  label={stat.label}
+                  className="pr-5 first:pl-0 [&:not(:first-child)]:pl-5"
+                  valueClassName="text-[1.4rem]"
+                  labelClassName="text-[10px]"
+                />
               ))}
             </div>
           </div>
@@ -182,14 +207,19 @@ export function HeroSection() {
                 </Link>
               </div>
 
-              <div className="mt-10 flex items-stretch divide-x divide-border">
-                {STATS.map((stat) => (
-                  <div key={stat.label} className="pr-8 first:pl-0 [&:not(:first-child)]:pl-8">
-                    <p className="text-[1.75rem] font-black leading-none text-foreground" style={{ fontFamily: "'Integral CF', 'Arial Black', sans-serif" }}>
-                      {stat.value}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-1">{stat.label}</p>
-                  </div>
+              <div className="mt-10 flex items-stretch divide-x divide-border overflow-hidden">
+                {STATS.map((stat, i) => (
+                  <AnimatedStat
+                    key={stat.label}
+                    index={i}
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    separator={stat.separator}
+                    label={stat.label}
+                    className="pr-8 first:pl-0 [&:not(:first-child)]:pl-8"
+                    valueClassName="text-[1.75rem]"
+                    labelClassName="text-[11px]"
+                  />
                 ))}
               </div>
             </div>

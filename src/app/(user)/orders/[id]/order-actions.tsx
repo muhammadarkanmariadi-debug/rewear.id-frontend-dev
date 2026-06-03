@@ -164,11 +164,22 @@ export function OrderActions({ order }: { order: any }) {
          console.warn("Failed to fetch shipping cost for ETD, using fallback.", err);
       }
 
-      const res = await shipmentService.updateTracking(
-        order.shipment?.id || order.id, 
-        trackingNumber, 
-        estimatedDeliveryAt
-      );
+      let res;
+      if (order.status === "paid") {
+         res = await shipmentService.addTracking(
+           order.id,
+           order.courier || "jne",
+           order.courier_service || "REG",
+           trackingNumber,
+           estimatedDeliveryAt
+         );
+      } else {
+         res = await shipmentService.updateTracking(
+           order.shipment?.id || order.id, 
+           trackingNumber, 
+           estimatedDeliveryAt
+         );
+      }
 
       if (res.status) {
          toast.success("Resi berhasil ditambahkan!");

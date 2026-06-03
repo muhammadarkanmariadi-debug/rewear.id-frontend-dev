@@ -1,5 +1,6 @@
 import { OrdersClient } from "@/widgets/orders/order-client";
 import { Suspense } from "react";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 
 
 export default function OrdersPage() {
@@ -11,8 +12,9 @@ export default function OrdersPage() {
           Lacak pembelian Anda dan kelola pesanan masuk dari pembeli.
         </p>
       </div>
-      <Suspense fallback={<p>Memuat Data...</p>}>   <OrdersClient /></Suspense>
-
+      <Suspense fallback={<TableSkeleton columns={5} rows={5} />}>
+         <OrdersClient />
+      </Suspense>
     </div>
   );
 }

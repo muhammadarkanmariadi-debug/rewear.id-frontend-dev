@@ -3,8 +3,13 @@ import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
 
 export const shipmentService = {
-  async addTracking(orderId: string, courier: string, service: string, trackingNumber: string) {
-    const payload = await encryptClientPayload(JSON.stringify({ courier, service, tracking_number: trackingNumber }));
+  async addTracking(orderId: string, courier: string, service: string, trackingNumber: string, estimatedDeliveryAt?: string) {
+    const payload = await encryptClientPayload(JSON.stringify({ 
+      courier, 
+      service, 
+      tracking_number: trackingNumber,
+      estimated_delivery_at: estimatedDeliveryAt
+    }));
     return httpPost(API_ENDPOINTS.SELLER_ORDER_SHIP(orderId), payload, "token");
   },
   async getShippingCost(data: Record<string, unknown>) {
