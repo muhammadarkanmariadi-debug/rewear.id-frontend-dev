@@ -13,8 +13,10 @@ export function TrackingTimeline({ shipmentId }: { shipmentId: string }) {
     const fetchTracking = async () => {
       try {
         const res = await shipmentService.track(shipmentId);
-        if (res.data) {
+        if (res.status && res.data) {
           setTracking(res.data);
+        } else {
+          setTracking(null);
         }
       } catch (e) {
         console.error("Failed to fetch tracking data", e);

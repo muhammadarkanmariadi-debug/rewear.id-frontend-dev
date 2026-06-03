@@ -87,8 +87,8 @@ export function OrderActions({ order }: { order: any }) {
         // @ts-ignore
         window.snap.pay(payRes.data.snap_token, {
           onSuccess: (result: any) => {
-            toast.success("payment success", result);
-            router.refresh();
+            toast.success("Pembayaran berhasil!");
+            router.push(`/orders/payment-success?order_id=${order.id}`);
           },
           onPending: (result: any) => {
             toast.info("payment pending", result);
