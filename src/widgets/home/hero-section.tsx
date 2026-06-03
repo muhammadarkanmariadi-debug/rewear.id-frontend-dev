@@ -60,7 +60,7 @@ export function HeroSection() {
               <Link href="/products" className="inline-flex items-center justify-center rounded-full bg-foreground px-8 py-3.5 text-sm font-semibold text-background hover:bg-foreground/85 transition-colors">
                 Shop Now
               </Link>
-              <Link href="/seller" className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-8 py-3.5 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors">
+              <Link href="/login" className="inline-flex items-center justify-center rounded-full border border-foreground/30 bg-transparent px-8 py-3.5 text-sm font-semibold text-foreground hover:bg-foreground/5 transition-colors">
                 Jual Sekarang
               </Link>
             </div>
