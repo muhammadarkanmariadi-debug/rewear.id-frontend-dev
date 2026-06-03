@@ -198,10 +198,13 @@ export function WalletClient() {
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">Rp</span>
               <input
-                type="number"
+                type="text"
                 placeholder="0"
-                value={amount || ""}
-                onChange={(e) => setAmount(Number(e.target.value))}
+                value={amount ? new Intl.NumberFormat("id-ID").format(amount) : ""}
+                onChange={(e) => {
+                   const rawValue = e.target.value.replace(/\D/g, "");
+                   setAmount(Number(rawValue));
+                }}
                 className="w-full bg-background border border-border rounded-xl pl-12 pr-4 py-3 text-lg font-bold outline-none focus:ring-2 focus:ring-foreground/20"
               />
             </div>

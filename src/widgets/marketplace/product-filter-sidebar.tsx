@@ -67,18 +67,18 @@ export function ProductFilterSidebar({
         <h3 className="font-semibold text-lg">Harga</h3>
         <div className="flex items-center gap-2">
           <input 
-            type="number" 
+            type="text" 
             placeholder="Min" 
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
+            value={minPrice ? new Intl.NumberFormat("id-ID").format(Number(minPrice)) : ""}
+            onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ""))}
             className="w-full p-2 text-sm border border-border rounded-md bg-transparent" 
           />
           <span className="text-muted-foreground">-</span>
           <input 
-            type="number" 
+            type="text" 
             placeholder="Max" 
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
+            value={maxPrice ? new Intl.NumberFormat("id-ID").format(Number(maxPrice)) : ""}
+            onChange={(e) => setMaxPrice(e.target.value.replace(/\D/g, ""))}
             className="w-full p-2 text-sm border border-border rounded-md bg-transparent" 
           />
         </div>

@@ -209,8 +209,9 @@ export default function EditProductPage({ params }: { params: Promise<{ slug: st
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-bold mb-1.5">Harga Jual (Rp)</label>
-                <input required type="number" placeholder="Cth: 150000" 
-                       value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})}
+                <input required type="text" placeholder="Cth: 150.000" 
+                       value={formData.price ? new Intl.NumberFormat("id-ID").format(Number(formData.price)) : ""} 
+                       onChange={e => setFormData({...formData, price: e.target.value.replace(/\D/g, "")})}
                        className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-foreground/20 font-bold" />
               </div>
               <div>
