@@ -3,10 +3,10 @@ import { Shirt, Tag, Sparkles } from "lucide-react";
 
 export function CategoryBrowse() {
   const categories = [
-    { name: "Baju Preloved", icon: <Shirt className="w-6 h-6" />, count: "4.2k+", href: "/products?category=baju" },
-    { name: "Celana Preloved", icon: <Shirt className="w-6 h-6 rotate-180" />, count: "2.1k+", href: "/products?category=celana" },
-    { name: "Brand Populer", icon: <Tag className="w-6 h-6" />, count: "Uniqlo, Zara...", href: "/products?sort=brand" },
-    { name: "Masih Baru (NWT)", icon: <Sparkles className="w-6 h-6" />, count: "800+ item", href: "/products?condition=baru" },
+    { name: "Baju Preloved", icon: <Shirt className="w-6 h-6" />, count: "4.2k+", href: "/products" },
+    { name: "Celana Preloved", icon: <Shirt className="w-6 h-6 rotate-180" />, count: "2.1k+", href: "/products" },
+    { name: "Brand Populer", icon: <Tag className="w-6 h-6" />, count: "Uniqlo, Zara...", href: "/products" },
+    { name: "Masih Baru (NWT)", icon: <Sparkles className="w-6 h-6" />, count: "800+ item", href: "/products" },
   ];
 
   return (
