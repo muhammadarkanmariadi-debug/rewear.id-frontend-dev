@@ -188,17 +188,19 @@ export function Navbar() {
                     <ShoppingBag className="w-4 h-4" /> Pesanan Saya
                   </Link>
                 )}
-                <Link onClick={() => setIsMobileMenuOpen(false)} href="/settings" className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
-                  <User className="w-4 h-4" /> Pengaturan
+                <Link onClick={() => setIsMobileMenuOpen(false)} href={isAdmin ? "/admin" : "/settings"} className="flex items-center gap-3 hover:bg-muted px-4 py-3 rounded-lg font-medium text-sm transition-colors">
+                  <User className="w-4 h-4" /> {isAdmin ? "Dashboard Admin" : "Pengaturan"}
                 </Link>
               </>
             )}
           </nav>
 
           <div className="flex flex-col gap-3 pt-4 border-border/40 border-t">
-            <Link onClick={() => setIsMobileMenuOpen(false)} href="/products/new" className="flex justify-center items-center bg-foreground hover:bg-foreground/90 shadow p-3 rounded-lg font-bold text-background text-sm transition-colors">
-              Mulai Jual Baju
-            </Link>
+            {!isAdmin && (
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/products/new" className="flex justify-center items-center bg-foreground hover:bg-foreground/90 shadow p-3 rounded-lg font-bold text-background text-sm transition-colors">
+                Mulai Jual Baju
+              </Link>
+            )}
 
 
             {isMounted && isAuthenticated ? (
