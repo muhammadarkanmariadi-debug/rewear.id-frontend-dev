@@ -136,14 +136,48 @@ export function OrderActions({ order }: { order: any }) {
 
     setIsSubmitting(true);
     try {
-      const res = await shipmentService.addTracking(order.id, order.courier || "jne", order.courier_service || "REG", trackingNumber);
+      let estimatedDeliveryAt = undefined;
+      
+      try {
+         // Attempt to fetch estimated delivery date
+         const costRes = await shipmentService.getShippingCost({
+            origin: order.seller?.default_address?.city_id || order.shipping_address?.city_id,
+            destination: order.shipping_address?.city_id,
+            weight: order.product?.weight_grams || 1000,
+            courier: order.courier || "jne"
+         });
+         
+         if (costRes.data && costRes.data.length > 0) {
+            const costs = costRes.data[0].costs || [];
+            const serviceCost = costs.find((c: any) => c.service === (order.courier_service || "REG"));
+            const etd = serviceCost?.cost?.[0]?.etd;
+            
+            if (etd) {
+               // etd format could be "1-2"
+               const days = parseInt(etd.split('-')[0]) || 3;
+               const deliveryDate = new Date();
+               deliveryDate.setDate(deliveryDate.getDate() + days);
+               estimatedDeliveryAt = deliveryDate.toISOString().split('T')[0] + " 23:59:59";
+            }
+         }
+      } catch (err) {
+         console.warn("Failed to fetch shipping cost for ETD, using fallback.", err);
+      }
+
+      const res = await shipmentService.updateTracking(
+        order.shipment?.id || order.id, 
+        trackingNumber, 
+        estimatedDeliveryAt
+      );
+
       if (res.status) {
+         toast.success("Resi berhasil ditambahkan!");
          router.refresh();
       } else {
-         toast("Gagal menambah resi");
+         toast.error("Gagal menambah resi");
       }
     } catch (e: any) {
-      toast("Error: " + e.message);
+      toast.error("Error: " + e.message);
     } finally {
       setIsSubmitting(false);
     }

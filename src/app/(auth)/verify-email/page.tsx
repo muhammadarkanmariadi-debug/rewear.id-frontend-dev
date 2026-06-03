@@ -24,7 +24,6 @@ function VerifyEmailLogic() {
 
   useEffect(() => {
     if (!uId || !uHash || !expires || !signature) {
-      // eslint-disable-next-line
       setError("Tautan verifikasi tidak lengkap.");
       return;
     }

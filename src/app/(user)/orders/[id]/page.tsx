@@ -4,6 +4,7 @@ import { ShieldCheck, MapPin, Package, ArrowLeft, Truck } from "lucide-react";
 import Link from "next/link";
 import { orderService, authService } from "@/services";
 import { OrderActions } from "./order-actions";
+import { TrackingTimeline } from "./tracking-timeline";
 
 interface OrderPageProps {
   params: Promise<{ id: string }>;
@@ -62,9 +63,12 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
             <div className="space-y-4">
               <p className="text-sm">Status saat ini: <span className="font-bold">{order.status.replace("_", " ")}</span></p>
               {order.shipment?.tracking_number && (
-                 <p className="text-sm text-muted-foreground">
-                   Resi terdaftar: {order.shipment.tracking_number} ({order.shipment.courier?.toUpperCase()})
-                 </p>
+                 <div className="space-y-4">
+                   <p className="text-sm text-muted-foreground">
+                     Resi terdaftar: {order.shipment.tracking_number} ({order.shipment.courier?.toUpperCase()})
+                   </p>
+                   <TrackingTimeline shipmentId={order.shipment.id} />
+                 </div>
               )}
             </div>
 

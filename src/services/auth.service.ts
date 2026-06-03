@@ -35,4 +35,7 @@ export const authService = {
   async verifyEmail(id: string, hash: string, expires: string, signature: string) {
     return httpGet(API_ENDPOINTS.AUTH_VERIFY_EMAIL(id, hash, expires, signature));
   },
+  async resendVerification() {
+    return httpPost(API_ENDPOINTS.AUTH_RESEND_VERIFICATION, "{}", "token");
+  },
 };

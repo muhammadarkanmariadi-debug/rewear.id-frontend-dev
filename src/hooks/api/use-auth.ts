@@ -84,3 +84,16 @@ export const useVerifyEmail = () => {
     },
   });
 };
+
+export const useResendVerification = () => {
+  return useMutation({
+    mutationFn: () => authService.resendVerification(),
+    onSuccess: (res) => {
+      if (!res.status) throw new Error(res.message || "Error");
+      toast.success("Email verifikasi telah dikirim ulang!");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Gagal mengirim ulang email.");
+    },
+  });
+};
