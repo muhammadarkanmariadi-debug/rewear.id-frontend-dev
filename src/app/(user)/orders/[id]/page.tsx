@@ -6,6 +6,7 @@ import { orderService, authService } from "@/services";
 import { OrderActions } from "./order-actions";
 import { TrackingTimeline } from "./tracking-timeline";
 import { OrderStatusBadge, getOrderStatusStyle } from "@/widgets/orders/order-status-badge";
+import { ExportReceiptButton } from "@/widgets/orders/export-receipt-button";
 
 interface OrderPageProps {
   params: Promise<{ id: string }>;
@@ -43,9 +44,12 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
           <h1 className="text-2xl font-bold tracking-tight">Status Pesanan: ORD-{order.order_number || order.id.slice(0, 8).toUpperCase()}</h1>
           <p className="text-sm text-muted-foreground mt-1">Dibeli pada {formatDate(order.created_at)}</p>
         </div>
-        <div className={`flex items-center gap-2 px-4 py-2 font-bold text-sm rounded-full shrink-0 uppercase ${getOrderStatusStyle(order.status)}`}>
-          <Truck className="w-4 h-4" />
-          {order.status.replace(/_/g, " ")}
+        <div className="flex flex-wrap items-center gap-3">
+          <ExportReceiptButton order={order} role={currentUserRes?.data?.id === order.seller_id ? 'seller' : 'buyer'} />
+          <div className={`flex items-center gap-2 px-4 py-2 font-bold text-sm rounded-full shrink-0 uppercase ${getOrderStatusStyle(order.status)}`}>
+            <Truck className="w-4 h-4" />
+            {order.status.replace(/_/g, " ")}
+          </div>
         </div>
       </div>
 

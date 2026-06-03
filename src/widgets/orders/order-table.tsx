@@ -12,6 +12,7 @@ interface Order {
   total_price?: number | string;
   total_amount?: number | string;
   status: string;
+  created_at?: string;
 }
 
 interface OrdersTableProps {
@@ -24,12 +25,45 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, role, loading }: OrdersTableProps) {
   const { user } = useAuthStore();
   const [ search, setSearch] = useState('')
-  const filterOrder = orders.filter((order) => order.id.toLowerCase().includes(search.toLowerCase()))
+  const [ startDate, setStartDate] = useState('')
+  const [ endDate, setEndDate] = useState('')
+
+  const filterOrder = orders.filter((order) => {
+    const matchSearch = order.id.toLowerCase().includes(search.toLowerCase());
+    let matchDate = true;
+    if (startDate && order.created_at) {
+      matchDate = new Date(order.created_at) >= new Date(startDate);
+    }
+    if (matchDate && endDate && order.created_at) {
+      const end = new Date(endDate);
+      end.setDate(end.getDate() + 1);
+      matchDate = new Date(order.created_at) < end;
+    }
+    return matchSearch && matchDate;
+  })
+
   return (
     <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
       {/* Toolbar */}
-      <div className="p-4 border-b border-border flex flex-col sm:flex-row gap-4 justify-between bg-surface-container/50">
-        <SearchBar value={search} onChange={setSearch} />
+      <div className="p-4 border-b border-border flex flex-col md:flex-row gap-4 justify-between bg-surface-container/50">
+        <div className="flex flex-col sm:flex-row gap-4 flex-1">
+          <SearchBar value={search} onChange={setSearch} />
+          <div className="flex items-center gap-2">
+            <input 
+              type="date" 
+              value={startDate} 
+              onChange={(e) => setStartDate(e.target.value)} 
+              className="h-9 px-3 rounded-lg border border-border bg-background text-sm outline-none focus:border-foreground transition-colors"
+            />
+            <span className="text-muted-foreground text-sm">-</span>
+            <input 
+              type="date" 
+              value={endDate} 
+              onChange={(e) => setEndDate(e.target.value)} 
+              className="h-9 px-3 rounded-lg border border-border bg-background text-sm outline-none focus:border-foreground transition-colors"
+            />
+          </div>
+        </div>
         <div className="flex gap-2">
           <Link
             href="?role=buyer"
