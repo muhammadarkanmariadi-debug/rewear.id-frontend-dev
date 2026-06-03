@@ -17,7 +17,7 @@ export function Navbar() {
   const [isMounted, setIsMounted] = useState(false);
 
   const { isAuthenticated, logout, user } = useAuthStore();
-  const isSeller = user?.is_seller || user?.is_seller_verified
+  const isSeller =  user?.is_seller_verified
   const isAdmin = user?.is_admin
   const pathname = usePathname();
 
