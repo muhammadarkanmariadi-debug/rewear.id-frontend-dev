@@ -1,37 +1,48 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import { formatRupiah } from "@/shared/utils/format";
-import { ArrowRight, Package, TrendingUp, Wallet } from "lucide-react";
+import { ArrowRight, Package, TrendingUp, Wallet, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { orderService, productService, authService } from "@/services";
 import { OrderStatusBadge } from "@/widgets/orders/order-status-badge";
+import { useSellerProducts } from "@/hooks/api/use-product";
+import { useAuthMe } from "@/hooks/api/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { orderService } from "@/services";
 
+export default function DashboardPage() {
+  const { data: prodRes, isLoading: isLoadingProd } = useSellerProducts();
+  const { data: meRes, isLoading: isLoadingMe } = useAuthMe();
+  
+  const { data: orderRes, isLoading: isLoadingOrder } = useQuery({
+    queryKey: ["seller-orders"],
+    queryFn: async () => {
+      const res = await orderService.getSellerOrders();
+      if (!res.status) throw new Error(res.message || "Error");
+      return res;
+    }
+  });
 
-export default async function DashboardPage() {
-  let products = [];
-  let orders = [];
-  let user = null;
+  const isLoading = isLoadingProd || isLoadingMe || isLoadingOrder;
 
-  try {
-     const [prodRes, orderRes, meRes] = await Promise.all([
-        productService.getSellerProducts(),
-        orderService.getSellerOrders(),
-        authService.getMe()
-     ]);
-     products = prodRes?.data?.slice(0, 3) || [];
-     orders = orderRes?.data?.slice(0, 4) || [];
-     user = meRes?.data || null;
-  } catch (error) {
-     console.error("Failed to load dashboard metrics", error);
-  }
+  const products = prodRes?.data?.slice(0, 3) || [];
+  const orders = orderRes?.data?.slice(0, 4) || [];
+  const user = meRes?.data || null;
 
-  // Dashboard sum metrics can be calculated directly or obtained via balance api if it exists.
-  // We will run basic calculation on orders as placeholder logic for dashboard.
   const stats = [
     { label: "Total Penjualanku", value: orders.length || 0, icon: Package, amount: null },
     { label: "Saldo Tersedia", value: null, icon: Wallet, amount: user?.balance || 0 },
     { label: "Dana Tertahan (Escrow)", value: null, icon: TrendingUp, amount: 0 },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">

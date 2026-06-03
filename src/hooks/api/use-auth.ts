@@ -25,6 +25,7 @@ export const useLogin = () => {
     mutationFn: ({ email, password }: Record<string, string>) => authService.login(email, password),
     onSuccess: (res) => {
       if (!res.status) throw new Error(res.message || "Error");
+      toast.success("Login berhasil!");
       // Let the component handle redirection and auth state
     },
     onError: (error: any) => {
@@ -39,6 +40,7 @@ export const useRegister = () => {
       authService.register(name, email, password, password_confirmation),
     onSuccess: (res) => {
       if (!res.status) throw new Error(res.message || "Error");
+      toast.success("Pendaftaran berhasil!");
     },
     onError: (error: any) => {
       toast.error(error.message || "Gagal registrasi.");

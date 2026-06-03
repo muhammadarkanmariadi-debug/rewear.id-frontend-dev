@@ -35,17 +35,6 @@ export function Navbar() {
   ];
 
   const navLinks = [...baseNavLinks];
-  if (isMounted && isAuthenticated) {
-    if (isAdmin) {
-      navLinks.push({ label: "Admin Dashboard", href: "/admin" });
-    } else {
-      if (isSeller) {
-        navLinks.push({ label: "Dashboard", href: "/dashboard" });
-      }
-      navLinks.push({ label: "Pesanan Saya", href: "/orders" });
-    }
-  }
-
 
   return (
     <header className="top-0 z-50 sticky bg-background/80 supports-[backdrop-filter]:bg-background/60 backdrop-blur-xl border-border/40 border-b w-full">
@@ -100,8 +89,8 @@ export function Navbar() {
           <div className="hidden sm:block mx-1 bg-border w-px h-6" />
 
           {isMounted && isAuthenticated ? (
-            <div className="hidden md:flex items-center gap-2">
-              <Link href={isAdmin ? "/admin" : "/settings"} className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
+            <div className="relative hidden md:flex items-center gap-2 group">
+              <button className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors focus:outline-none">
                 {user?.avatar_url ? (
                   <Image src={user.avatar_url} alt={user.name} width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                 ) : (
@@ -110,10 +99,25 @@ export function Navbar() {
                   </div>
                 )}
                 <span className="text-sm font-medium pr-1">{user?.name}</span>
-              </Link>
-              <button onClick={async () => { await authService.logout(); logout(); window.location.href = '/login' }} title="Keluar" className="flex items-center justify-center hover:bg-red-500/10 w-9 h-9 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
-                <LogOut className="w-4 h-4" />
               </button>
+
+              <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all w-48 z-50">
+                <div className="bg-card border border-border rounded-xl shadow-lg flex flex-col overflow-hidden py-1">
+                  {isAdmin ? (
+                    <Link href="/admin" className="px-4 py-2.5 hover:bg-muted text-sm font-medium transition-colors">Dashboard Admin</Link>
+                  ) : (
+                    <>
+                      {isSeller && <Link href="/dashboard" className="px-4 py-2.5 hover:bg-muted text-sm font-medium transition-colors">Dashboard Seller</Link>}
+                      <Link href="/orders" className="px-4 py-2.5 hover:bg-muted text-sm font-medium transition-colors">Pesanan Saya</Link>
+                      <Link href="/settings" className="px-4 py-2.5 hover:bg-muted text-sm font-medium transition-colors">Pengaturan Profil</Link>
+                    </>
+                  )}
+                  <div className="h-px bg-border my-1" />
+                  <button onClick={async () => { await authService.logout(); logout(); window.location.href = '/login' }} className="px-4 py-2.5 hover:bg-red-500/10 text-red-500 text-sm font-medium text-left transition-colors">
+                    Keluar Akun
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <Link href="/login" className="hidden lg:inline-flex items-center gap-2 hover:bg-muted px-3 py-2 rounded-md font-medium text-muted-foreground hover:text-foreground text-sm transition-colors">
