@@ -51,11 +51,16 @@ export function OrdersClient() {
     setCurrentPage(1);
   }, [role]);
 
+  // Filter out expired and cancelled orders for buyers if they are expired/cancelled
+  const activeOrders = role === "buyer" 
+    ? orders.filter(o => o.status !== 'expire' && o.status !== 'cancelled' && o.status !== 'failed')
+    : orders;
+
   return (
     <div className="space-y-6">
-      <OrdersTable orders={orders} role={role} loading={loading} />
+    <OrdersTable orders={activeOrders} role={role} loading={loading} />
       
-      {!loading && orders.length > 0 && (
+      {!loading && activeOrders.length > 0 && (
         <DataPagination
           currentPage={currentPage}
           lastPage={lastPage}

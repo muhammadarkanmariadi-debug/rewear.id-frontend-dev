@@ -130,15 +130,7 @@ export default function LoginPage() {
         <span className="h-px w-full bg-border"></span>
       </div>
 
-      <div className="mt-6">
-        <button
-          type="button"
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-        >
-          Lanjutkan dengan Google
-        </button>
-      </div>
+   
 
       <div className="mt-6 text-center text-sm text-muted-foreground">
         Belum punya akun?{" "}

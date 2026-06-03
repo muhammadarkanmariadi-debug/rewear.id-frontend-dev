@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { formatRupiah } from "@/shared/utils/format";
-import { Search, Plus, Edit } from "lucide-react";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/entities/product";
 import { DataPagination } from "@/widgets/data-pagination";
-import { useSellerProducts } from "@/hooks/api/use-product";
+import { useSellerProducts, useRemoveProduct } from "@/hooks/api/use-product";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { motion } from "framer-motion";
 
 export function MyProductsClient() {
+  const { mutate: removeProduct } = useRemoveProduct();
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
@@ -133,8 +134,18 @@ export function MyProductsClient() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-end relative group cursor-pointer gap-2">
-                       <button className="p-2 text-muted-foreground hover:text-foreground bg-surface-container/50 hover:bg-surface-container rounded-lg">
+                       <Link href={`/my-products/${product.slug}/edit`} className="p-2 text-muted-foreground hover:text-foreground bg-surface-container/50 hover:bg-surface-container rounded-lg transition-colors">
                          <Edit className="w-4 h-4" />
+                       </Link>
+                       <button 
+                         onClick={() => {
+                           if (confirm("Yakin ingin menghapus produk ini?")) {
+                             removeProduct(product.id);
+                           }
+                         }}
+                         className="p-2 text-muted-foreground hover:text-red-500 bg-surface-container/50 hover:bg-red-500/10 rounded-lg transition-colors"
+                       >
+                         <Trash2 className="w-4 h-4" />
                        </button>
                     </div>
                   </td>

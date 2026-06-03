@@ -117,13 +117,36 @@ export function OrderActions({ order }: { order: any }) {
     setIsSubmitting(true);
     try {
       const res = await orderService.confirmDelivery(order.id);
+      console.log(res)
+
+    
       if (res.status) {
+        toast.success("Pesanan sudah dikonfimasi!")
          router.refresh();
       } else {
          toast("Gagal mengonfirmasi");
       }
     } catch (e: any) {
       toast("Error: " + e.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) return;
+    
+    setIsSubmitting(true);
+    try {
+      const res = await orderService.cancel(order.id);
+      if (res.status) {
+        toast.success("Pesanan berhasil dibatalkan");
+        router.refresh();
+      } else {
+        toast.error("Gagal membatalkan pesanan");
+      }
+    } catch (e: any) {
+      toast.error("Terjadi kesalahan: " + e.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -152,7 +175,7 @@ export function OrderActions({ order }: { order: any }) {
             const etd = serviceCost?.cost?.[0]?.etd;
             
             if (etd) {
-               // etd format could be "1-2"
+             
                const days = parseInt(etd.split('-')[0]) || 3;
                const deliveryDate = new Date();
                deliveryDate.setDate(deliveryDate.getDate() + days);
@@ -203,13 +226,23 @@ export function OrderActions({ order }: { order: any }) {
           </p>
         </div>
         
-        <button 
-           onClick={handlePay}
-           disabled={isSubmitting || (timeLeft !== null && timeLeft <= 0)}
-           className="w-full bg-foreground text-background font-bold h-12 rounded-xl transition-all shadow-md hover:bg-foreground/90 active:scale-95 disabled:opacity-50"
-        >
-          {isSubmitting ? "Memproses..." : "Perbarui & Bayar Sekarang"}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button 
+             onClick={handlePay}
+             disabled={isSubmitting || (timeLeft !== null && timeLeft <= 0)}
+             className="flex-1 bg-foreground text-background font-bold h-12 rounded-xl transition-all shadow-md hover:bg-foreground/90 active:scale-95 disabled:opacity-50"
+          >
+            {isSubmitting ? "Memproses..." : "Bayar Sekarang"}
+          </button>
+          
+          <button 
+             onClick={handleCancel}
+             disabled={isSubmitting}
+             className="flex-1 bg-surface-container border border-border text-foreground font-bold h-12 rounded-xl transition-all hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 active:scale-95 disabled:opacity-50"
+          >
+            Batalkan Pesanan
+          </button>
+        </div>
 
         <p className="text-[10px] text-muted-foreground text-center mt-3 leading-relaxed">
           Selesaikan pembayaran sebelum waktu habis agar pesanan tidak dibatalkan otomatis oleh sistem.
@@ -255,6 +288,22 @@ export function OrderActions({ order }: { order: any }) {
           </form>
         </div>
      );
+  }
+
+  if (isBuyer && order.status === "paid") {
+    return (
+      <div className="mt-8 pt-6 border-t border-border/50">
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6">
+          <h3 className="text-blue-700 dark:text-blue-400 font-bold text-lg mb-2 flex items-center gap-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Pembayaran Berhasil!
+          </h3>
+          <p className="text-sm text-blue-700/80 dark:text-blue-400/80 leading-relaxed">
+            Dana Anda telah diamankan oleh sistem Escrow. Kami telah memberitahu penjual untuk segera memproses dan mengirimkan pesanan Anda.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return null;

@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores";
 import Link from "next/link";
 import { SearchBar } from "../marketplace/search-bar";
 import { useState } from "react";
+import { OrderStatusBadge } from "./order-status-badge";
 
 interface Order {
   id: string;
@@ -98,9 +99,7 @@ export function OrdersTable({ orders, role, loading }: OrdersTableProps) {
                     {formatRupiah(Number(order.total_amount || order.total_price || 0))}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 font-bold rounded-md text-xs uppercase">
-                      {order.status}
-                    </span>
+                    <OrderStatusBadge status={order.status} />
                   </td>
                   <td className="px-6 py-4 flex gap-2 justify-end">
                     {role === "buyer" && order.status === "pending_payment" && (

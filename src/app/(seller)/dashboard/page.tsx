@@ -4,6 +4,7 @@ import { ArrowRight, Package, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { orderService, productService, authService } from "@/services";
+import { OrderStatusBadge } from "@/widgets/orders/order-status-badge";
 
 
 export default async function DashboardPage() {
@@ -89,7 +90,7 @@ export default async function DashboardPage() {
                    <tr key={order.id} className="hover:bg-muted/30 transition-colors">
                      <td className="px-6 py-4 font-semibold"><Link href={`/orders/${order.id}`} className="hover:underline">ORD-{order.id.slice(0, 8).toUpperCase()}</Link></td>
                      <td className="px-6 py-4">
-                       <span className="px-2.5 py-1 bg-blue-500/10 text-blue-500 font-bold rounded-md text-xs uppercase">{order.status}</span>
+                       <OrderStatusBadge status={order.status} />
                      </td>
                      <td className="px-6 py-4 font-semibold">{formatRupiah(Number(order.total_price))}</td>
                    </tr>

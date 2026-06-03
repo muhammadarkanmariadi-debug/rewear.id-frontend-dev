@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { httpGet, httpPost } from "@/lib/http-client";
 import { encryptClientPayload } from "@/lib/auth-token";
 import { API_ENDPOINTS } from "@/configs/api";
@@ -19,5 +20,9 @@ export const orderService = {
   async confirmDelivery(id: string) {
     const payload = await encryptClientPayload(JSON.stringify({}));
     return httpPost(API_ENDPOINTS.ORDER_CONFIRM_RECEIVED(id), payload, "token");
+  },
+  async cancel(id: string, reason: string = "Dibatalkan oleh pembeli") {
+    const payload = await encryptClientPayload(JSON.stringify({ reason }));
+    return httpPost(`${API_ENDPOINTS.ORDERS}/${id}/cancel`, payload, "token");
   },
 };

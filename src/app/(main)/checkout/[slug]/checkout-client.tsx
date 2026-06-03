@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Truck, ShieldCheck } from "lucide-react";
 import { formatRupiah } from "@/shared/utils/format";
-import { addressService, shipmentService, orderService, paymentService } from "@/services";
+import { addressService, shipmentService, orderService } from "@/services";
 import { toast } from "sonner";
 
 
@@ -167,48 +165,9 @@ export function CheckoutClient({ product }: { product: Product }) {
       }
 
       const orderId = res.data.id ?? res.data.order_id;
-
-      // Step 2: Initiate Payment
-      const payRes = await paymentService.initiate(orderId as string);
-
-      if (!payRes.status || !payRes.data?.snap_token) {
-        toast.info("Pesanan dibuat, tetapi gagal memulai pembayaran. Silakan bayar dari halaman pesanan.");
-        router.push(`/orders/${orderId}`);
-        return;
-      }
-
-      // Step 3: Trigger Midtrans Snap
-      // @ts-ignore
-      if (window.snap) {
-        // @ts-ignore
-        window.snap.pay(payRes.data.snap_token, {
-          onSuccess: (result: any) => {
-       
-            toast.success("Pembayaran berhasil!");
-            router.push(`/orders/${orderId}`);
-          },
-          onPending: (result: any) => {
-           
-            toast.info("Menunggu pembayaran.");
-            router.push(`/orders/${orderId}`);
-          },
-          onError: (result: any) => {
-          
-            toast.error("Pembayaran gagal.");
-            router.push(`/orders/${orderId}`);
-          },
-          onClose: () => {
-            
-            toast.warning("Pembayaran dibatalkan.");
-            router.push(`/orders/${orderId}`);
-          },
-        });
-      } else {
-        toast.error("Midtrans Snap tidak termuat. Hubungi support.");
-        router.push(`/orders/${orderId}`);
-      }
+      toast.success("Pesanan berhasil dibuat!");
+      router.push(`/orders/${orderId}`);
     } catch (error) {
-    
       toast.error("Terjadi kesalahan pada server. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
@@ -418,7 +377,7 @@ export function CheckoutClient({ product }: { product: Product }) {
                 Memproses...
               </span>
             ) : (
-              "Mulai Bayar & Escrow"
+              "Checkout"
             )}
           </button>
         </div>
