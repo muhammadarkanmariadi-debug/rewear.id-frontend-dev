@@ -16,7 +16,7 @@ export function AdminProductsClient() {
   const [perPage, setPerPage] = useState(15);
 
   // Fetch all data for client-side filtering and pagination
-  const { data: res, isLoading: loading } = useAdminProducts({ per_page: 1000 , page:1 });
+  const { data: res, isLoading: loading } = useAdminProducts({ per_page: 10 , page:1 });
   const allProducts = res?.data || [];
 
   // Client-side filtering

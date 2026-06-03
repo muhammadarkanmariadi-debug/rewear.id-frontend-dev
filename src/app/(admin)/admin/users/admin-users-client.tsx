@@ -23,7 +23,7 @@ export function AdminUsersClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 
-  const { data: res, isLoading: loading } = useAdminUsers({ per_page: 1000 });
+  const { data: res, isLoading: loading } = useAdminUsers({ per_page: 10 });
   const allUsers = res?.data || [];
 
   const filteredUsers = allUsers.filter((user: User) => 

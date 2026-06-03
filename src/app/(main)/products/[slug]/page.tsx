@@ -40,7 +40,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   const formattedPrice = formatRupiah(Number(product.price || 0));
 
-  // Filter out empty string image URLs, fallback ke placeholder
+
   const images = product.images
     ?.map((img: any) => img.image_url)
     .filter((url: string) => !!url) ?? [];

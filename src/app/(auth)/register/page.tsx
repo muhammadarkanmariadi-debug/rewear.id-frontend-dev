@@ -6,6 +6,7 @@ import { User, Mail, Lock, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRegister } from "@/hooks/api/use-auth";
+import { Input } from "@/components/ui/input";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -65,84 +66,56 @@ export default function RegisterPage() {
         )}
 
         {/* Name Input */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium" htmlFor="name">Nama Lengkap</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <User className="h-4 w-4" />
-            </div>
-            <input
-              id="name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Ahmad Fauzi"
-              disabled={loading}
-            />
-          </div>
-        </div>
+        <Input
+          id="name"
+          type="text"
+          label="Nama Lengkap"
+          icon={<User className="h-4 w-4" />}
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Ahmad Fauzi"
+          disabled={loading}
+        />
 
         {/* Email Input */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium" htmlFor="email">Email</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <Mail className="h-4 w-4" />
-            </div>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="nama@email.com"
-              disabled={loading}
-            />
-          </div>
-        </div>
+        <Input
+          id="email"
+          type="email"
+          label="Email"
+          icon={<Mail className="h-4 w-4" />}
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="nama@email.com"
+          disabled={loading}
+        />
 
         {/* Password Input */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium" htmlFor="password">Kata Sandi</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <Lock className="h-4 w-4" />
-            </div>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Minimal 8 karakter"
-              disabled={loading}
-            />
-          </div>
-        </div>
+        <Input
+          id="password"
+          type="password"
+          label="Kata Sandi"
+          icon={<Lock className="h-4 w-4" />}
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Minimal 8 karakter"
+          disabled={loading}
+        />
 
         {/* Confirm Password Input */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium" htmlFor="confirm-password">Konfirmasi Sandi</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <Lock className="h-4 w-4" />
-            </div>
-            <input
-              id="confirm-password"
-              type="password"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Ketik ulang kata sandi"
-              disabled={loading}
-            />
-          </div>
-        </div>
+        <Input
+          id="confirm-password"
+          type="password"
+          label="Konfirmasi Sandi"
+          icon={<Lock className="h-4 w-4" />}
+          required
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Ketik ulang kata sandi"
+          disabled={loading}
+        />
 
         <button
           type="submit"

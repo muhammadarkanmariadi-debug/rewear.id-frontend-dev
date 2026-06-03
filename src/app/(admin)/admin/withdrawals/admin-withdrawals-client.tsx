@@ -15,7 +15,7 @@ export function AdminWithdrawalsClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(15);
 
-  const { data: res, isLoading: loading } = useAdminWithdrawals({ per_page: 1000 });
+  const { data: res, isLoading: loading } = useAdminWithdrawals({ per_page: 10 });
   const allWithdrawals = res?.data || [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

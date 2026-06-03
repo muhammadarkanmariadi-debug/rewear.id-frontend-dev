@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLogin } from "@/hooks/api/use-auth";
+import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -66,48 +67,36 @@ export default function LoginPage() {
         )}
 
         {/* Email Input */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium" htmlFor="email">Email</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <Mail className="h-4 w-4" />
-            </div>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="nama@email.com"
-              disabled={loading}
-            />
-          </div>
-        </div>
+        <Input
+          id="email"
+          type="email"
+          label="Email"
+          icon={<Mail className="h-4 w-4" />}
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="nama@email.com"
+          disabled={loading}
+        />
 
         {/* Password Input */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium" htmlFor="password">Kata Sandi</label>
+            <label className="text-sm font-semibold text-foreground/80" htmlFor="password">Kata Sandi</label>
             <Link href="/forgot-password" className="text-xs font-semibold text-primary hover:underline">
               Lupa Sandi?
             </Link>
           </div>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <Lock className="h-4 w-4" />
-            </div>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="••••••••"
-              disabled={loading}
-            />
-          </div>
+          <Input
+            id="password"
+            type="password"
+            icon={<Lock className="h-4 w-4" />}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            disabled={loading}
+          />
         </div>
 
         <button
