@@ -9,10 +9,13 @@ import { userService } from "@/services";
 import { toast } from "sonner";
 import { useProfileSettings } from "@/shared/hooks/use-profile-settings";
 import { CldUploadWidget } from "next-cloudinary";
+import { useAuthStore } from "@/stores/auth.store";
+import { setCookies } from "@/lib/cookies";
 
 export default function SellerVerificationPage() {
   const router = useRouter();
   const { user, loading, fetchData } = useProfileSettings();
+  const { setUser } = useAuthStore();
   const [isUploading, setIsUploading] = useState(false);
   const [ktpImageUrl, setKtpImageUrl] = useState<string | null>(null);
 
@@ -34,6 +37,13 @@ export default function SellerVerificationPage() {
       const res = await userService.updateProfile(payload);
       if (res.status) {
         toast.success(res.message || "KTP berhasil diunggah.");
+        
+        // Update global state and cookies so the navbar/sidebar update instantly
+        if (res.data) {
+          setUser(res.data);
+          if (res.data.is_seller) await setCookies("is_seller", "true");
+        }
+        
         router.push("/settings");
         fetchData();
       } else {

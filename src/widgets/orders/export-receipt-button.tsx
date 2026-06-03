@@ -1,146 +1,148 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Download } from "lucide-react";
 import { formatRupiah, formatDate } from "@/shared/utils/format";
-import { useRef, useState } from "react";
+import { useState, useEffect } from "react";
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from "@react-pdf/renderer";
+
+const styles = StyleSheet.create({
+  page: { padding: 40, fontFamily: "Helvetica", fontSize: 12, color: "#333" },
+  header: { flexDirection: "row", justifyContent: "space-between", borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 15, marginBottom: 20 },
+  brand: { fontSize: 24, fontWeight: "extrabold", color: "#000" },
+  brandAccent: { color: "#2563eb" },
+  brandSub: { fontSize: 10, color: "#666", marginTop: 4 },
+  title: { fontSize: 16, fontWeight: "bold", textAlign: "right", textTransform: "uppercase" },
+  orderNo: { fontSize: 12, fontWeight: "bold", color: "#444", textAlign: "right", marginTop: 4 },
+  infoRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
+  label: { fontSize: 10, color: "#666", marginBottom: 4 },
+  value: { fontSize: 12, fontWeight: "bold", textTransform: "uppercase" },
+  section: { marginBottom: 20 },
+  sectionTitle: { fontSize: 12, fontWeight: "bold", borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 5, marginBottom: 10 },
+  grid: { flexDirection: "row", justifyContent: "space-between" },
+  col: { flex: 1, paddingRight: 10 },
+  table: { width: "100%", marginTop: 10 },
+  tableHeader: { flexDirection: "row", backgroundColor: "#f3f4f6", padding: 8, borderBottomWidth: 1, borderBottomColor: "#ddd" },
+  tableRow: { flexDirection: "row", padding: 10, borderBottomWidth: 1, borderBottomColor: "#eee" },
+  tableColLeft: { flex: 2 },
+  tableColRight: { flex: 1, textAlign: "right" },
+  footer: { marginTop: 40, borderTopWidth: 1, borderTopColor: "#eee", paddingTop: 10, textAlign: "center", fontSize: 10, color: "#888" },
+});
 
 interface ExportReceiptButtonProps {
   order: any;
   role?: string;
 }
 
-export function ExportReceiptButton({ order, role = "buyer" }: ExportReceiptButtonProps) {
-  const [isExporting, setIsExporting] = useState(false);
-  const receiptRef = useRef<HTMLDivElement>(null);
-
-  const handleExport = async () => {
-    if (!receiptRef.current) return;
-    setIsExporting(true);
-
-    try {
-      const element = receiptRef.current;
-      const opt = {
-        margin: 0.5,
-        filename: `Resi_${role === "buyer" ? "Pembelian" : "Penjualan"}_ORD-${order.id.slice(0, 8).toUpperCase()}.pdf`,
-        image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
-      };
-
-      const html2pdf = (await import('html2pdf.js')).default;
-      await html2pdf().set(opt).from(element).save();
-    } catch (error) {
-      console.error("Gagal export PDF:", error);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
+const ReceiptDocument = ({ order, role }: ExportReceiptButtonProps) => {
   const addr = order.shipping_address || order.address;
+  const orderNumber = order.order_number || order.id.slice(0, 8).toUpperCase();
 
   return (
-    <>
-      <button 
-        onClick={handleExport}
-        disabled={isExporting}
-        className="flex items-center gap-2 px-4 py-2 bg-foreground text-background font-bold text-sm rounded-lg hover:bg-foreground/90 transition-colors disabled:opacity-50"
-      >
-        <Download className="w-4 h-4" />
-        {isExporting ? "Mengekspor..." : `Export Resi ${role === "buyer" ? "Pembelian" : "Penjualan"}`}
-      </button>
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.brand}>rewear<Text style={styles.brandAccent}>.id</Text></Text>
+            <Text style={styles.brandSub}>Platform Thrifting Terpercaya</Text>
+          </View>
+          <View>
+            <Text style={styles.title}>Resi {role === "buyer" ? "Pembelian" : "Penjualan"}</Text>
+            <Text style={styles.orderNo}>ORD-{orderNumber}</Text>
+          </View>
+        </View>
 
-      {/* Hidden layout for PDF generation */}
-      <div className="hidden">
-        <div ref={receiptRef} className="p-8 max-w-2xl bg-white text-black mx-auto font-sans" style={{ width: '800px' }}>
-          <div className="flex justify-between items-center border-b pb-4 mb-6">
-            <div>
-              <h1 className="text-3xl font-black tracking-tighter">rewear<span className="text-blue-600">.id</span></h1>
-              <p className="text-gray-500 text-sm mt-1">Platform Thrifting Terpercaya</p>
-            </div>
-            <div className="text-right">
-              <h2 className="text-xl font-bold uppercase text-gray-800">Resi {role === "buyer" ? "Pembelian" : "Penjualan"}</h2>
-              <p className="text-sm font-bold text-gray-600 mt-1">ORD-{order.order_number || order.id.slice(0, 8).toUpperCase()}</p>
-            </div>
-          </div>
+        <View style={styles.infoRow}>
+          <View>
+            <Text style={styles.label}>Tanggal Pesanan</Text>
+            <Text style={styles.value}>{formatDate(order.created_at)}</Text>
+          </View>
+          <View style={{ textAlign: "right" }}>
+            <Text style={styles.label}>Status</Text>
+            <Text style={styles.value}>{order.status.replace(/_/g, " ")}</Text>
+          </View>
+        </View>
 
-          <div className="flex justify-between mb-8 text-sm">
-            <div>
-              <p className="text-gray-500 mb-1">Tanggal Pesanan</p>
-              <p className="font-bold">{formatDate(order.created_at)}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-gray-500 mb-1">Status</p>
-              <p className="font-bold uppercase">{order.status.replace(/_/g, " ")}</p>
-            </div>
-          </div>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Informasi Pengiriman</Text>
+          <View style={styles.grid}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Penerima</Text>
+              <Text style={styles.value}>{addr?.recipient_name || order.buyer?.name}</Text>
+              <Text style={{ fontSize: 10, marginTop: 4 }}>{addr?.phone_number || addr?.phone || order.buyer?.phone}</Text>
+            </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Alamat</Text>
+              <Text style={{ fontSize: 10, marginTop: 4 }}>{addr?.full_address || addr?.address}</Text>
+              <Text style={{ fontSize: 10, marginTop: 2 }}>{addr?.district}, {addr?.city?.name || addr?.city}</Text>
+            </View>
+          </View>
+        </View>
 
-          <div className="mb-8">
-            <h3 className="font-bold border-b pb-2 mb-4">Informasi Pengiriman</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500">Penerima</p>
-                <p className="font-bold">{addr?.recipient_name || order.buyer?.name}</p>
-                <p>{addr?.phone_number || addr?.phone || order.buyer?.phone}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Alamat</p>
-                <p>{addr?.full_address || addr?.address}</p>
-                <p>{addr?.district}, {addr?.city?.name || addr?.city}</p>
-              </div>
-            </div>
-          </div>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Detail Layanan Pengiriman</Text>
+          <View style={styles.grid}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Kurir</Text>
+              <Text style={styles.value}>{order.shipment?.courier || order.courier || "-"}</Text>
+            </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Nomor Resi</Text>
+              <Text style={styles.value}>{order.shipment?.tracking_number || "Belum ada resi"}</Text>
+            </View>
+          </View>
+        </View>
 
-          <div className="mb-8">
-            <h3 className="font-bold border-b pb-2 mb-4">Detail Layanan Pengiriman</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500">Kurir</p>
-                <p className="font-bold uppercase">{order.shipment?.courier || order.courier || "-"}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Nomor Resi</p>
-                <p className="font-bold tracking-wider">{order.shipment?.tracking_number || "Belum ada resi"}</p>
-              </div>
-            </div>
-          </div>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Detail Produk</Text>
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={[styles.tableColLeft, { fontWeight: "bold" }]}>Produk</Text>
+              <Text style={[styles.tableColRight, { fontWeight: "bold" }]}>Harga</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableColLeft}>{order.product?.title || "Produk"}</Text>
+              <Text style={styles.tableColRight}>{formatRupiah(Number(order.total_amount || order.total_price))}</Text>
+            </View>
+            <View style={[styles.tableRow, { backgroundColor: "#f9fafb", borderBottomWidth: 0 }]}>
+              <Text style={[styles.tableColLeft, { textAlign: "right", color: "#666" }]}>Total Pembayaran</Text>
+              <Text style={[styles.tableColRight, { fontWeight: "bold", fontSize: 14 }]}>
+                {formatRupiah(Number(order.total_amount || order.total_price))}
+              </Text>
+            </View>
+          </View>
+        </View>
 
-          <div>
-            <h3 className="font-bold border-b pb-2 mb-4">Detail Produk</h3>
-            <table className="w-full text-sm text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-100 text-gray-700">
-                  <th className="py-2 px-4 border">Produk</th>
-                  <th className="py-2 px-4 border w-32 text-right">Harga</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-3 px-4 border font-medium">
-                    {order.product?.title || "Produk"}
-                  </td>
-                  <td className="py-3 px-4 border text-right font-bold">
-                    {formatRupiah(Number(order.total_amount || order.total_price))}
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr className="bg-gray-50">
-                  <td className="py-3 px-4 border text-right font-bold text-gray-600">Total Pembayaran</td>
-                  <td className="py-3 px-4 border text-right font-bold text-lg text-black">
-                    {formatRupiah(Number(order.total_amount || order.total_price))}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-          
-          <div className="mt-12 pt-8 border-t text-center text-gray-500 text-xs">
-            <p>Terima kasih telah berbelanja di rewear.id!</p>
-            <p className="mt-1">Dokumen ini adalah bukti transaksi yang sah dan dicetak secara otomatis.</p>
-          </div>
-        </div>
-      </div>
-    </>
+        <View style={styles.footer}>
+          <Text>Terima kasih telah berbelanja di rewear.id!</Text>
+          <Text style={{ marginTop: 4 }}>Dokumen ini adalah bukti transaksi yang sah dan dicetak secara otomatis.</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+};
+
+export function ExportReceiptButton({ order, role = "buyer" }: ExportReceiptButtonProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <PDFDownloadLink
+      document={<ReceiptDocument order={order} role={role} />}
+      fileName={`Resi_${role === "buyer" ? "Pembelian" : "Penjualan"}_ORD-${(order.order_number || order.id).slice(0, 8).toUpperCase()}.pdf`}
+      className="flex items-center gap-2 px-4 py-2 bg-foreground text-background font-bold text-sm rounded-lg hover:bg-foreground/90 transition-colors"
+    >
+      {({ loading }) => (
+        <>
+          <Download className="w-4 h-4" />
+          {loading ? "Menyiapkan PDF..." : `Export Resi ${role === "buyer" ? "Pembelian" : "Penjualan"}`}
+        </>
+      )}
+    </PDFDownloadLink>
   );
 }

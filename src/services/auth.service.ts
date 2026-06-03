@@ -18,7 +18,7 @@ export const authService = {
     return res;
   },
   async getMe() {
-    return httpGet(API_ENDPOINTS.AUTH_ME, "token");
+    return httpGet(API_ENDPOINTS.AUTH_ME, "token", { cache: "no-store" });
   },
   async googleOAuth(token: string) {
     const payload = await encryptClientPayload(JSON.stringify({ token }));

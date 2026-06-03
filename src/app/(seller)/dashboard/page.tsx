@@ -10,6 +10,7 @@ import { useSellerProducts } from "@/hooks/api/use-product";
 import { useAuthMe } from "@/hooks/api/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { orderService } from "@/services";
+import { Order } from "@/entities";
 
 export default function DashboardPage() {
   const { data: prodRes, isLoading: isLoadingProd } = useSellerProducts();
@@ -97,13 +98,13 @@ export default function DashboardPage() {
                   <tr>
                      <td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">Belum ada pesanan terbaru.</td>
                   </tr>
-                ) : orders.map((order: any) => (
+                ) : orders.map((order: Order) => (
                    <tr key={order.id} className="hover:bg-muted/30 transition-colors">
                      <td className="px-6 py-4 font-semibold"><Link href={`/orders/${order.id}`} className="hover:underline">ORD-{order.id.slice(0, 8).toUpperCase()}</Link></td>
                      <td className="px-6 py-4">
                        <OrderStatusBadge status={order.status} />
                      </td>
-                     <td className="px-6 py-4 font-semibold">{formatRupiah(Number(order.total_price))}</td>
+                     <td className="px-6 py-4 font-semibold">{formatRupiah(Number(order.total_amount))}</td>
                    </tr>
                 ))}
               </tbody>
