@@ -86,16 +86,15 @@ export function OrderActions({ order }: { order: any }) {
       if (window.snap) {
         // @ts-ignore
         window.snap.pay(payRes.data.snap_token, {
-          onSuccess: (result: any) => {
+          onSuccess: () => {
             toast.success("Pembayaran berhasil!");
             router.push(`/orders/payment-success?order_id=${order.id}`);
           },
-          onPending: (result: any) => {
-            toast.info("payment pending", result);
+          onPending: () => {
+            toast.info("payment pending");
             router.refresh();
           },
-          onError: (result: any) => {
-            toast.error("payment error", result);
+          onError: () => {
             toast.error("Pembayaran gagal.");
           },
           onClose: () => {
@@ -219,7 +218,7 @@ export function OrderActions({ order }: { order: any }) {
     );
   }
 
-  if (isBuyer && order.status === "shipped") {
+  if (isBuyer && ["shipped", "delivered"].includes(order.status)) {
      return (
         <div className="mt-8 pt-6 border-t border-border/50">
           <button 

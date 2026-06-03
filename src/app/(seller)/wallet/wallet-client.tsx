@@ -45,8 +45,7 @@ export function WalletClient() {
     if (bankAccounts.length > 0 && !selectedBankId) {
       setSelectedBankId(bankAccounts[0].id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bankAccounts.length, selectedBankId, bankAccounts]);
+  }, [bankAccounts, selectedBankId]);
 
   const [showAddBank, setShowAddBank] = useState(false);
   const [newBank, setNewBank] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
