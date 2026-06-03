@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { shipmentService } from "@/services";
 import { CheckCircle2, Clock } from "lucide-react";
 
@@ -9,12 +10,18 @@ export function TrackingTimeline({ shipmentId }: { shipmentId: string }) {
   const [tracking, setTracking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchTracking = async () => {
       try {
         const res = await shipmentService.track(shipmentId);
         if (res.status && res.data) {
           setTracking(res.data);
+          // If tracking indicates delivered, refresh the page to update order actions
+          if (res.data.summary?.status?.toUpperCase() === 'DELIVERED') {
+            router.refresh();
+          }
         } else {
           setTracking(null);
         }
@@ -26,7 +33,7 @@ export function TrackingTimeline({ shipmentId }: { shipmentId: string }) {
     };
 
     fetchTracking();
-  }, [shipmentId]);
+  }, [shipmentId, router]);
 
   if (loading) {
     return (

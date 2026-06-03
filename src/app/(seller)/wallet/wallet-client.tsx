@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { formatRupiah } from "@/shared/utils/format";
 import { ArrowDownToLine, Receipt, Wallet } from "lucide-react";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ interface WithdrawalItem {
 
 export function WalletClient() {
   const { data: resBanks, isLoading: loadingBanks } = useBankAccounts();
-  const bankAccounts = resBanks?.data || [];
+  const bankAccounts = useMemo(() => resBanks?.data || [], [resBanks?.data]);
   
   const { data: resWithdrawals, isLoading: loadingWithdrawals } = useWalletWithdrawals();
   const withdrawals = resWithdrawals?.data || [];
