@@ -34,7 +34,18 @@ export function Navbar() {
 
   ];
 
-  const navLinks = isSeller && !isAdmin ? [...baseNavLinks, { label: "Dashboard", href: "/dashboard" }, { label: "Pesanan Saya", href: "/orders" }] : isAuthenticated && isMounted && !isAdmin ? [...baseNavLinks, { label: "Pesanan Saya", href: "/orders" }] : baseNavLinks
+  const navLinks = [...baseNavLinks];
+  if (isMounted && isAuthenticated) {
+    if (isAdmin) {
+      navLinks.push({ label: "Admin Dashboard", href: "/admin" });
+    } else {
+      if (isSeller) {
+        navLinks.push({ label: "Dashboard", href: "/dashboard" });
+      }
+      navLinks.push({ label: "Pesanan Saya", href: "/orders" });
+    }
+  }
+
 
   return (
     <header className="top-0 z-50 sticky bg-background/80 supports-[backdrop-filter]:bg-background/60 backdrop-blur-xl border-border/40 border-b w-full">
@@ -90,11 +101,11 @@ export function Navbar() {
 
           {isMounted && isAuthenticated ? (
             <div className="hidden md:flex items-center gap-2">
-              <Link href={isAdmin ? "/admin/dashboard" : "/settings"} className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
+              <Link href={isAdmin ? "/admin" : "/settings"} className="flex items-center gap-2 hover:bg-muted px-2 py-1.5 rounded-full transition-colors">
                 {user?.avatar_url ? (
                   <Image src={user.avatar_url} alt={user.name} width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-muted-foreground/20 flex items-center justify-center text-muted-foreground font-bold text-xs uppercase">
+                  <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs uppercase">
                     {user?.name?.charAt(0)}
                   </div>
                 )}
